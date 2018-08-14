@@ -1,0 +1,12 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "logs.ap-northeast-1.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}

@@ -1,0 +1,36 @@
+{
+    "Version": "2008-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${cloudfront_origin_access_identity}"
+            },
+            "Action": "s3:GetObject",
+            "Resource": "${s3_bucket_web_arn}/*"
+        },
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "${iam_role_build_web_arn}"
+            },
+            "Action": [
+                "s3:GetObject",
+                "s3:PutObject",
+                "s3:DeleteObject"
+            ],
+            "Resource": "${s3_bucket_web_arn}/*"
+        },
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "${iam_role_build_web_arn}"
+            },
+            "Action": "s3:ListBucket",
+            "Resource": [
+                "${s3_bucket_web_arn}",
+                "${s3_bucket_web_arn}/*"
+            ]
+        }
+    ]
+}
