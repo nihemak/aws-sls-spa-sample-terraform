@@ -77,6 +77,8 @@ Create S3 bucket for Terraform state saving:
 
 ```bash
 $ aws s3 mb s3://foobar-sample-spa-terraform-state --region ap-northeast-1
+$ aws s3api put-bucket-versioning --bucket foobar-sample-spa-terraform-state \
+                                  --versioning-configuration Status=Enabled
 ```
 
 Create CodeBuild's service role for setup:
