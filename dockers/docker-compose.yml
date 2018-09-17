@@ -1,0 +1,8 @@
+version: '3'
+services:
+  shellcheck:
+    image: koalaman/shellcheck-alpine
+    tty: true
+    volumes:
+      - ../bin/:/scripts/
+      - ./shellcheck/bin/shellcheck.sh:/shellcheck.sh

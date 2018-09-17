@@ -8,7 +8,7 @@ prefix="/aws/lambda/$api_stack"
 echo "${prefix}"
 
 aws logs describe-log-groups \
-  --log-group-name-prefix "${prefix}"| jq -r '.logGroups[].logGroupName' | while read log_group_name
+  --log-group-name-prefix "${prefix}"| jq -r '.logGroups[].logGroupName' | while read -r log_group_name
 do
   aws logs put-subscription-filter \
     --log-group-name "$log_group_name" \

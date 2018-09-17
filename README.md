@@ -1,5 +1,7 @@
 # AWS Serverless SPA(Single Page Application) Sample: Build infrastructure with Terraform
 
+[![CircleCI](https://circleci.com/gh/nihemak/aws-sls-spa-sample-terraform/tree/master.svg?style=svg)](https://circleci.com/gh/nihemak/aws-sls-spa-sample-terraform/tree/master)
+
 This is a sample to build infrastructure of AWS serverless SPA service with Terraform.
 The repositories for sample of SPA services are [API](https://github.com/nihemak/aws-sls-spa-sample-api) and [Web](https://github.com/nihemak/aws-sls-spa-sample-web).
 
