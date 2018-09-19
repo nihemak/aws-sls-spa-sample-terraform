@@ -22,18 +22,18 @@ locals {
 }
 
 module "s3_bucket_build_artifacts" {
-  source          = "../../modules/s3/bucket/build_artifacts"
+  source          = "../../../modules/s3/bucket/build_artifacts"
   resource_prefix = "${local.resource_prefix}"
 }
 
 module "iam_role_build_service" {
-  source          = "../../modules/iam/build_service"
-  path            = "../../modules/iam/build_service"
+  source          = "../../../modules/iam/build_service"
+  path            = "../../../modules/iam/build_service"
   resource_prefix = "${local.resource_prefix}"
 }
 
 module "codebuild_staging" {
-  source                       = "../../modules/codebuild/service/staging"
+  source                       = "../../../modules/codebuild/service/staging"
   codecommit_repository        = "${var.codecommit_infra_repository}"
   s3_bucket_source_id          = "${module.s3_bucket_build_artifacts.id}"
   resource_prefix              = "${local.resource_prefix}"
@@ -42,7 +42,7 @@ module "codebuild_staging" {
 }
 
 module "codebuild_production" {
-  source                       = "../../modules/codebuild/service/production"
+  source                       = "../../../modules/codebuild/service/production"
   s3_bucket_source_arn         = "${module.s3_bucket_build_artifacts.arn}"
   resource_prefix              = "${local.resource_prefix}"
   iam_role_build_arn           = "${module.iam_role_build_service.arn}"
@@ -50,13 +50,13 @@ module "codebuild_production" {
 }
 
 module "iam_role_pipeline_build" {
-  source          = "../../modules/iam/pipeline_build"
-  path            = "../../modules/iam/pipeline_build"
+  source          = "../../../modules/iam/pipeline_build"
+  path            = "../../../modules/iam/pipeline_build"
   resource_prefix = "${local.resource_prefix}"
 }
 
 module "codepipeline_service" {
-  source                      = "../../modules/codepipeline/service"
+  source                      = "../../../modules/codepipeline/service"
   resource_prefix             = "${local.resource_prefix}"
   s3_bucket_artifact_store_id = "${module.s3_bucket_build_artifacts.id}"
   codecommit_repository       = "${var.codecommit_infra_repository}"
@@ -67,16 +67,16 @@ module "codepipeline_service" {
 }
 
 module "cloudwatch_codepipeline_service" {
-  source                = "../../modules/cloudwatch_event/service"
-  path                  = "../../modules/cloudwatch_event/service"
+  source                = "../../../modules/cloudwatch_event/service"
+  path                  = "../../../modules/cloudwatch_event/service"
   resource_prefix       = "${local.resource_prefix}"
   aws_account_id        = "${data.aws_caller_identity.current.account_id}"
   codecommit_repository = "${var.codecommit_infra_repository}"
 }
 
 module "iam_role_codecommit_codepipeline_service" {
-  source           = "../../modules/iam/codecommit_codepipeline_service"
-  path             = "../../modules/iam/codecommit_codepipeline_service"
+  source           = "../../../modules/iam/codecommit_codepipeline_service"
+  path             = "../../../modules/iam/codecommit_codepipeline_service"
   resource_prefix  = "${local.resource_prefix}"
   codepipeline_arn = "${module.codepipeline_service.arn}"
 }
