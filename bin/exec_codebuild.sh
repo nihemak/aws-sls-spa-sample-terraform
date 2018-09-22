@@ -3,11 +3,11 @@
 project_name=$1
 source_version=$2
 
-options=""
+codebuild_args=(codebuild start-build --project-name "${project_name}")
 if [ "$source_version" != "" ]; then
-  options+="--source-version $source_version"
+  codebuild_args=("${codebuild_args[@]}" "--source-version" "${source_version}")
 fi
-codebuild_id=$(aws codebuild start-build --project-name "$project_name" "$options" | tr -d "\n" | jq -r '.build.id')
+codebuild_id=$(aws "${codebuild_args[@]}" | tr -d "\n" | jq -r '.build.id')
 echo "$project_name started.. id is $codebuild_id"
 while true
 do

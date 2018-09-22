@@ -1,0 +1,67 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:logs:ap-northeast-1:${aws_account_id}:log-group:/aws/codebuild/${resource_prefix}-*"
+            ],
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+                "logs:FilterLogEvents"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:logs:ap-northeast-1:${aws_account_id}:log-group:*"
+            ],
+            "Action": [
+                "logs:DescribeLogStreams",
+                "logs:DescribeLogGroups"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Resource": [
+                "${s3_bucket_web_arn}/*"
+            ],
+            "Action": [
+                "s3:GetObject",
+                "s3:PutObject",
+                "s3:DeleteObject"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Resource": [
+                "${s3_bucket_web_arn}",
+                "${s3_bucket_web_arn}/*"
+            ],
+            "Action": [
+                "s3:ListBucket",
+                "s3:ListBucketVersions"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Resource": [
+                "${s3_bucket_source_arn}/*"
+            ],
+            "Action": [
+                "s3:*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:codecommit:ap-northeast-1:${aws_account_id}:*"
+            ],
+            "Action": [
+                "codecommit:GitPull"
+            ]
+        }
+    ]
+}
