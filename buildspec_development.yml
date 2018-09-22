@@ -53,7 +53,7 @@ phases:
       - terraform apply -auto-approve
       - codebuild_name=`terraform output codebuild_api_name`
       - cd -
-      - ./bin/exec_codebuild.sh "$codebuild_name" master
+      - ./bin/exec_codebuild.sh "$codebuild_name" "$codecommit_api_branch"
       - export TF_VAR_apigw_api_id=$(aws cloudformation describe-stack-resource --stack-name "${cloudformation_api_stack}" --logical-resource-id ApiGatewayRestApi | jq -r '.StackResourceDetail.PhysicalResourceId')
       - ./bin/mapping_logs_firehose.sh "$cloudformation_api_stack" "$firehose_delivery_stream_arn" "$iam_role_api_log_cloudwatchlogs_to_s3_policy_arn"
       # base
@@ -69,7 +69,7 @@ phases:
       - terraform apply -auto-approve
       - codebuild_name=`terraform output codebuild_web_name`
       - cd -
-      - ./bin/exec_codebuild.sh "$codebuild_name" master
+      - ./bin/exec_codebuild.sh "$codebuild_name" "$codecommit_web_branch"
 
   post_build:
     commands:
