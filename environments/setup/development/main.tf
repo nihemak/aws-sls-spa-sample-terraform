@@ -15,6 +15,10 @@ terraform {
 
 data "aws_caller_identity" "current" {}
 
+locals {
+  resource_prefix = "${var.service_name}-setup"
+}
+
 module "s3_bucket_build_artifacts" {
   source          = "../../../modules/s3/bucket/build_artifacts"
   resource_prefix = "${local.resource_prefix}"
