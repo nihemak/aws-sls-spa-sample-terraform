@@ -71,7 +71,6 @@ module "s3_bucket_policy_web" {
 module "codebuild_web" {
   source                  = "../../../../modules/codebuild/web/development"
   codecommit_repository   = "${data.terraform_remote_state.setup.codecommit_web_repository}"
-  s3_bucket_source_id     = "${data.terraform_remote_state.setup.s3_bucket_artifacts_id}"
   resource_prefix         = "${local.resource_prefix}"
   stage                   = "${var.stage}"
   s3_bucket_web_id        = "${data.terraform_remote_state.service_base_pre.s3_bucket_web_id}"
