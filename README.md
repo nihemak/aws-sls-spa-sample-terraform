@@ -121,6 +121,11 @@ $ cat Environment.json
       "type": "PLAINTEXT"
     },
     {
+      "name": "TF_VAR_codecommit_infra_repository",
+      "value": "foobar-sample-spa-infra",
+      "type": "PLAINTEXT"
+    },
+    {
       "name": "TF_VAR_codecommit_api_repository",
       "value": "foobar-sample-spa-api",
       "type": "PLAINTEXT"
