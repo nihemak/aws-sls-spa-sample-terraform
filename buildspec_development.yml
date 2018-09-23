@@ -35,7 +35,7 @@ phases:
       - cd environments/setup/development
       - terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" -backend-config="key=${TF_VAR_tfstate_setup_key}"
       - terraform plan
-      - terraform apply -auto-approve
+      - terraform apply -auto-approve -var "codecommit_api_branch=$codecommit_api_branch" -var "codecommit_web_branch=$codecommit_web_branch"
       - cd -
       # base
       - cd environments/service/base/pre/

@@ -3,6 +3,8 @@ variable "s3_bucket_terraform_state_id" {}
 variable "codecommit_infra_repository" {}
 variable "codecommit_api_repository" {}
 variable "codecommit_web_repository" {}
+variable "codecommit_api_branch" {}
+variable "codecommit_web_branch" {}
 
 provider "aws" {}
 
@@ -37,6 +39,8 @@ module "codebuild_destroy" {
   resource_prefix              = "${local.resource_prefix}"
   iam_role_build_arn           = "${module.iam_role_build_service.arn}"
   s3_bucket_terraform_state_id = "${var.s3_bucket_terraform_state_id}"
+  codecommit_api_branch        = "${var.codecommit_api_branch}"
+  codecommit_web_branch        = "${var.codecommit_web_branch"
 }
 
 ## outputs
