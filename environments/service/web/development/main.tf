@@ -80,6 +80,18 @@ module "codebuild_web" {
   api_base_url            = "${data.terraform_remote_state.service_base_after_api.api_base_url}"
 }
 
+module "codebuild_destroy_web" {
+  source                  = "../../../../modules/codebuild/destroy_web/development"
+  codecommit_repository   = "${data.terraform_remote_state.setup.codecommit_web_repository}"
+  resource_prefix         = "${local.resource_prefix}"
+  s3_bucket_web_id        = "${data.terraform_remote_state.service_base_pre.s3_bucket_web_id}"
+  iam_role_build_web_arn  = "${module.iam_role_build_web.arn}"
+}
+
 output "codebuild_web_name" {
   value = "${module.codebuild_web.name}"
+}
+
+output "codebuild_destroy_web_name" {
+  value = "${module.codebuild_destroy_web.name}"
 }

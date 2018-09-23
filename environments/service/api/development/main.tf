@@ -68,6 +68,17 @@ module "codebuild_api" {
   service_name           = "${data.terraform_remote_state.setup.service_name}"
 }
 
+module "codebuild_destroy_api" {
+  source                 = "../../../../modules/codebuild/destroy_api/development"
+  codecommit_repository  = "${data.terraform_remote_state.setup.codecommit_api_repository}"
+  iam_role_build_api_arn = "${module.iam_role_build_api.arn}"
+  resource_prefix        = "${local.resource_prefix}"
+}
+
 output "codebuild_api_name" {
   value = "${module.codebuild_api.name}"
+}
+
+output "codebuild_destroy_api_name" {
+  value = "${module.codebuild_destroy_api.name}"
 }
