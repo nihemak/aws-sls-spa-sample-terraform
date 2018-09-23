@@ -31,20 +31,25 @@ phases:
 
   build:
     commands:
-      # web
+      # info
       - cd environments/service/web/development/
       - terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" -backend-config="key=${TF_VAR_tfstate_service_web_key}"
-      - codebuild_name=`terraform output codebuild_destroy_web_name`
+      - codebuild_destroy_web_name=`terraform output codebuild_destroy_web_name`
       - cd -
-      - ./bin/exec_codebuild.sh "$codebuild_name" "$codecommit_web_branch"
-      - cd environments/service/web/development/
-      - terraform plan -destroy
-      - terraform destroy -auto-approve
+      - cd environments/service/api/development/
+      - terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" -backend-config="key=${TF_VAR_tfstate_service_api_key}"
+      - codebuild_destroy_api_name=`terraform output codebuild_destroy_api_name`
       - cd -
       - cd environments/service/base/pre/
       - terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" -backend-config="key=${TF_VAR_tfstate_service_base_pre_key}"
       - cloudformation_api_stack=`terraform output cloudformation_api_stack`
       - export TF_VAR_apigw_api_id=$(aws cloudformation describe-stack-resource --stack-name "${cloudformation_api_stack}" --logical-resource-id ApiGatewayRestApi | jq -r '.StackResourceDetail.PhysicalResourceId')
+      - cd -
+      # web
+      - ./bin/exec_codebuild.sh "$codebuild_destroy_web_name" "$codecommit_web_branch"
+      - cd environments/service/web/development/
+      - terraform plan -destroy
+      - terraform destroy -auto-approve
       - cd -
       # base
       - cd environments/service/base/after_api
@@ -54,11 +59,7 @@ phases:
       - cd -
       # api
       - ./bin/mapping_logs_delete_firehose.sh "$cloudformation_api_stack"
-      - cd environments/service/api/development/
-      - terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" -backend-config="key=${TF_VAR_tfstate_service_api_key}"
-      - codebuild_name=`terraform output codebuild_destroy_api_name`
-      - cd -
-      - ./bin/exec_codebuild.sh "$codebuild_name" "$codecommit_api_branch"
+      - ./bin/exec_codebuild.sh "$codebuild_destroy_api_name" "$codecommit_api_branch"
       - cd environments/service/api/development/
       - terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" -backend-config="key=${TF_VAR_tfstate_service_api_key}"
       - terraform plan -destroy
