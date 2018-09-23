@@ -15,6 +15,7 @@ resource "aws_codebuild_project" "destroy_api" {
     compute_type = "BUILD_GENERAL1_SMALL"
     image        = "aws/codebuild/nodejs:8.11.0"
     type         = "LINUX_CONTAINER"
+  }
 
   artifacts {
     type = "NO_ARTIFACTS"
