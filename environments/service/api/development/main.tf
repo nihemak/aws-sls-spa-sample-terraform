@@ -72,7 +72,13 @@ module "codebuild_destroy_api" {
   source                 = "../../../../modules/codebuild/destroy_api/development"
   codecommit_repository  = "${data.terraform_remote_state.setup.codecommit_api_repository}"
   iam_role_build_api_arn = "${module.iam_role_build_api.arn}"
+  s3_bucket_build_api_id = "${module.s3_bucket_build_api.id}"
   resource_prefix        = "${local.resource_prefix}"
+  stage                  = "${var.stage}"
+  iam_role_exec_api_arn  = "${data.terraform_remote_state.service_base_pre.iam_role_exec_api_arn}"
+  cognito_pool_arn       = "${data.terraform_remote_state.service_base_pre.cognito_pool_api_arn}"
+  cors                   = "${data.terraform_remote_state.service_base_pre.web_base_url}"
+  service_name           = "${data.terraform_remote_state.setup.service_name}"
 }
 
 output "codebuild_api_name" {
