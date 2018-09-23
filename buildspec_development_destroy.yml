@@ -41,6 +41,11 @@ phases:
       - terraform plan -destroy
       - terraform destroy -auto-approve
       - cd -
+      - cd environments/service/base/pre/
+      - terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" -backend-config="key=${TF_VAR_tfstate_service_base_pre_key}"
+      - cloudformation_api_stack=`terraform output cloudformation_api_stack`
+      - export TF_VAR_apigw_api_id=$(aws cloudformation describe-stack-resource --stack-name "${cloudformation_api_stack}" --logical-resource-id ApiGatewayRestApi | jq -r '.StackResourceDetail.PhysicalResourceId')
+      - cd -
       # base
       - cd environments/service/base/after_api
       - terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" -backend-config="key=${TF_VAR_tfstate_service_base_after_api_key}"
@@ -48,10 +53,6 @@ phases:
       - terraform destroy -auto-approve
       - cd -
       # api
-      - cd environments/service/base/pre/
-      - terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" -backend-config="key=${TF_VAR_tfstate_service_base_pre_key}"
-      - cloudformation_api_stack=`terraform output cloudformation_api_stack`
-      - cd -
       - ./bin/mapping_logs_delete_firehose.sh "$cloudformation_api_stack"
       - cd environments/service/api/development/
       - terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" -backend-config="key=${TF_VAR_tfstate_service_api_key}"
