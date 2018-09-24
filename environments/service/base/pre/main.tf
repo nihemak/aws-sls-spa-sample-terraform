@@ -1,6 +1,10 @@
 variable "stage" {}
 variable "s3_bucket_terraform_state_id" {}
 variable "tfstate_setup_key" {}
+variable "resource_prefix" {}
+variable "s3_bucket_audit_log_id" {}
+variable "s3_bucket_audit_log_bucket_domain_name" {}
+variable "s3_bucket_api_log_arn" {}
 
 provider "aws" {}
 
@@ -26,15 +30,8 @@ data "terraform_remote_state" "setup" {
 
 locals {
   service_name             = "${data.terraform_remote_state.setup.service_name}"
-  resource_prefix          = "${local.service_name}-${var.stage}"
+  resource_prefix          = "${var.resource_prefix}"
   cloudformation_api_stack = "${local.service_name}-api-${var.stage}"
-}
-
-## audit log
-
-module "s3_bucket_audit_log" {
-  source          = "../../../../modules/s3/bucket/audit_log"
-  resource_prefix = "${local.resource_prefix}"
 }
 
 ## dynamo db
@@ -58,19 +55,11 @@ module "waf_acl" {
   resource_prefix = "${local.resource_prefix}"
 }
 
-## s3 bucket api log
-
-module "s3_bucket_api_log" {
-  source            = "../../../../modules/s3/bucket/api_log"
-  resource_prefix   = "${local.resource_prefix}"
-  logging_bucket_id = "${module.s3_bucket_audit_log.id}"
-}
-
 module "iam_role_api_log_firehose_to_s3" {
   source          = "../../../../modules/iam/api_log_firehose_to_s3"
   path            = "../../../../modules/iam/api_log_firehose_to_s3"
   resource_prefix = "${local.resource_prefix}"
-  s3_bucket_arn   = "${module.s3_bucket_api_log.arn}"
+  s3_bucket_arn   = "${var.s3_bucket_api_log_arn}"
 }
 
 resource "aws_kinesis_firehose_delivery_stream" "api_log" {
@@ -79,7 +68,7 @@ resource "aws_kinesis_firehose_delivery_stream" "api_log" {
 
   s3_configuration {
     role_arn           = "${module.iam_role_api_log_firehose_to_s3.arn}"
-    bucket_arn         = "${module.s3_bucket_api_log.arn}"
+    bucket_arn         = "${var.s3_bucket_api_log_arn}"
     compression_format = "GZIP"
   }
 }
@@ -106,13 +95,13 @@ module "iam_role_exec_api" {
 module "s3_bucket_web" {
   source            = "../../../../modules/s3/bucket/web"
   resource_prefix   = "${local.resource_prefix}"
-  logging_bucket_id = "${module.s3_bucket_audit_log.id}"
+  logging_bucket_id = "${var.s3_bucket_audit_log_id}"
 }
 
 module "cloudfront_web" {
   source                          = "../../../../modules/cloudfront/web"
   resource_prefix                 = "${local.resource_prefix}"
-  s3_bucket_audit_log_domain_name = "${module.s3_bucket_audit_log.bucket_domain_name}"
+  s3_bucket_audit_log_domain_name = "${var.s3_bucket_audit_log_bucket_domain_name}"
   s3_bucket_web_id                = "${module.s3_bucket_web.id}"
   s3_bucket_web_domain_name       = "${module.s3_bucket_web.domain_name}"
   waf_acl_id                      = "${module.waf_acl.id}"
@@ -129,11 +118,11 @@ output "cloudformation_api_stack" {
 }
 
 output "s3_bucket_audit_log_id" {
-  value = "${module.s3_bucket_audit_log.id}"
+  value = "${var.s3_bucket_audit_log_id}"
 }
 
 output "s3_bucket_audit_log_domain_name" {
-  value = "${module.s3_bucket_audit_log.bucket_domain_name}"
+  value = "${var.s3_bucket_audit_log_bucket_domain_name}"
 }
 
 output "cognito_pool_api_id" {

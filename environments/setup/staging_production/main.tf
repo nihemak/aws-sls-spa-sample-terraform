@@ -4,6 +4,8 @@ variable "codecommit_infra_repository" {}
 variable "codecommit_api_repository" {}
 variable "codecommit_web_repository" {}
 variable "approval_sns_topic_arn" {}
+variable "stage_staging" {}
+variable "stage_production" {}
 
 provider "aws" {}
 
@@ -18,7 +20,9 @@ terraform {
 data "aws_caller_identity" "current" {}
 
 locals {
-  resource_prefix = "${var.service_name}-setup"
+  resource_prefix            = "${var.service_name}-setup"
+  resource_prefix_staging    = "${var.service_name}-${var.stage_staging}"
+  resource_prefix_production = "${var.service_name}-${var.stage_production}"
 }
 
 module "s3_bucket_build_artifacts" {
@@ -32,21 +36,51 @@ module "iam_role_build_service" {
   resource_prefix = "${local.resource_prefix}"
 }
 
+module "s3_bucket_audit_log_staging" {
+  source          = "../../../modules/s3/bucket/audit_log"
+  resource_prefix = "${local.resource_prefix_staging}"
+}
+
+module "s3_bucket_audit_log_production" {
+  source          = "../../../modules/s3/bucket/audit_log"
+  resource_prefix = "${local.resource_prefix_production}"
+}
+
+module "s3_bucket_api_log_staging" {
+  source            = "../../../modules/s3/bucket/api_log"
+  resource_prefix   = "${local.resource_prefix_staging}"
+  logging_bucket_id = "${module.s3_bucket_audit_log_staging.id}"
+}
+
+module "s3_bucket_api_log_production" {
+  source            = "../../../modules/s3/bucket/api_log"
+  resource_prefix   = "${local.resource_prefix_production}"
+  logging_bucket_id = "${module.s3_bucket_audit_log_production.id}"
+}
+
 module "codebuild_staging" {
-  source                       = "../../../modules/codebuild/service/staging"
-  codecommit_repository        = "${var.codecommit_infra_repository}"
-  s3_bucket_source_id          = "${module.s3_bucket_build_artifacts.id}"
-  resource_prefix              = "${local.resource_prefix}"
-  iam_role_build_arn           = "${module.iam_role_build_service.arn}"
-  s3_bucket_terraform_state_id = "${var.s3_bucket_terraform_state_id}"
+  source                                 = "../../../modules/codebuild/service/staging"
+  codecommit_repository                  = "${var.codecommit_infra_repository}"
+  s3_bucket_source_id                    = "${module.s3_bucket_build_artifacts.id}"
+  resource_prefix                        = "${local.resource_prefix}"
+  iam_role_build_arn                     = "${module.iam_role_build_service.arn}"
+  s3_bucket_terraform_state_id           = "${var.s3_bucket_terraform_state_id}"
+  service_resource_prefix                = "${local.resource_prefix_staging}"
+  s3_bucket_audit_log_id                 = "${module.s3_bucket_audit_log_staging.id}"
+  s3_bucket_audit_log_bucket_domain_name = "${module.s3_bucket_audit_log_staging.bucket_domain_name}"
+  s3_bucket_api_log_arn                  = "${module.s3_bucket_api_log_staging.arn}"
 }
 
 module "codebuild_production" {
-  source                       = "../../../modules/codebuild/service/production"
-  s3_bucket_source_arn         = "${module.s3_bucket_build_artifacts.arn}"
-  resource_prefix              = "${local.resource_prefix}"
-  iam_role_build_arn           = "${module.iam_role_build_service.arn}"
-  s3_bucket_terraform_state_id = "${var.s3_bucket_terraform_state_id}"
+  source                                 = "../../../modules/codebuild/service/production"
+  s3_bucket_source_arn                   = "${module.s3_bucket_build_artifacts.arn}"
+  resource_prefix                        = "${local.resource_prefix}"
+  iam_role_build_arn                     = "${module.iam_role_build_service.arn}"
+  s3_bucket_terraform_state_id           = "${var.s3_bucket_terraform_state_id}"
+  service_resource_prefix                = "${local.resource_prefix_production}"
+  s3_bucket_audit_log_id                 = "${module.s3_bucket_audit_log_production.id}"
+  s3_bucket_audit_log_bucket_domain_name = "${module.s3_bucket_audit_log_production.bucket_domain_name}"
+  s3_bucket_api_log_arn                  = "${module.s3_bucket_api_log_production.arn}"
 }
 
 module "iam_role_pipeline_build" {

@@ -121,6 +121,11 @@ $ cat Environment.json
       "type": "PLAINTEXT"
     },
     {
+      "name": "TF_VAR_codecommit_infra_repository",
+      "value": "foobar-sample-spa-infra",
+      "type": "PLAINTEXT"
+    },
+    {
       "name": "TF_VAR_codecommit_api_repository",
       "value": "foobar-sample-spa-api",
       "type": "PLAINTEXT"
@@ -155,6 +160,12 @@ Run CodeBuild to build infrastructure and api and web with Terraform:
 
 ```bash
 $ aws codebuild start-build --project-name foobar-sample-spa-dev --source-version <branch of infrastructure>
+```
+
+To delete the environment, execute the following:
+
+```bash
+$ aws codebuild start-build --project-name foobar-sample-spa-setup-destroy-service-codebuild-01 --source-version <branch of infrastructure>
 ```
 
 ## Getting Started (Staging and Production)
