@@ -162,6 +162,12 @@ Run CodeBuild to build infrastructure and api and web with Terraform:
 $ aws codebuild start-build --project-name foobar-sample-spa-dev --source-version <branch of infrastructure>
 ```
 
+To delete the environment, execute the following:
+
+```bash
+$ aws codebuild start-build --project-name foobar-sample-spa-setup-destroy-service-codebuild-01 --source-version <branch of infrastructure>
+```
+
 ## Getting Started (Staging and Production)
 
 Migrate a Github repository to AWS CodeCommit.
