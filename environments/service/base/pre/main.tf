@@ -2,6 +2,8 @@ variable "stage" {}
 variable "s3_bucket_terraform_state_id" {}
 variable "tfstate_setup_key" {}
 variable "resource_prefix" {}
+variable "s3_bucket_audit_log_id" {}
+variable "s3_bucket_audit_log_bucket_domain_name" {}
 
 provider "aws" {}
 
@@ -31,13 +33,6 @@ locals {
   cloudformation_api_stack = "${local.service_name}-api-${var.stage}"
 }
 
-## audit log
-
-module "s3_bucket_audit_log" {
-  source          = "../../../../modules/s3/bucket/audit_log"
-  resource_prefix = "${local.resource_prefix}"
-}
-
 ## dynamo db
 
 module "dynamodb" {
@@ -64,7 +59,7 @@ module "waf_acl" {
 module "s3_bucket_api_log" {
   source            = "../../../../modules/s3/bucket/api_log"
   resource_prefix   = "${local.resource_prefix}"
-  logging_bucket_id = "${module.s3_bucket_audit_log.id}"
+  logging_bucket_id = "${var.s3_bucket_audit_log_id}"
 }
 
 module "iam_role_api_log_firehose_to_s3" {
@@ -107,13 +102,13 @@ module "iam_role_exec_api" {
 module "s3_bucket_web" {
   source            = "../../../../modules/s3/bucket/web"
   resource_prefix   = "${local.resource_prefix}"
-  logging_bucket_id = "${module.s3_bucket_audit_log.id}"
+  logging_bucket_id = "${var.s3_bucket_audit_log_id}"
 }
 
 module "cloudfront_web" {
   source                          = "../../../../modules/cloudfront/web"
   resource_prefix                 = "${local.resource_prefix}"
-  s3_bucket_audit_log_domain_name = "${module.s3_bucket_audit_log.bucket_domain_name}"
+  s3_bucket_audit_log_domain_name = "${var.s3_bucket_audit_log_bucket_domain_name}"
   s3_bucket_web_id                = "${module.s3_bucket_web.id}"
   s3_bucket_web_domain_name       = "${module.s3_bucket_web.domain_name}"
   waf_acl_id                      = "${module.waf_acl.id}"
@@ -130,11 +125,11 @@ output "cloudformation_api_stack" {
 }
 
 output "s3_bucket_audit_log_id" {
-  value = "${module.s3_bucket_audit_log.id}"
+  value = "${var.s3_bucket_audit_log_id}"
 }
 
 output "s3_bucket_audit_log_domain_name" {
-  value = "${module.s3_bucket_audit_log.bucket_domain_name}"
+  value = "${var.s3_bucket_audit_log_bucket_domain_name}"
 }
 
 output "cognito_pool_api_id" {

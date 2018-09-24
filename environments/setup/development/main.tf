@@ -5,6 +5,7 @@ variable "codecommit_api_repository" {}
 variable "codecommit_web_repository" {}
 variable "codecommit_api_branch" {}
 variable "codecommit_web_branch" {}
+variable "stage" {}
 
 provider "aws" {}
 
@@ -19,7 +20,13 @@ terraform {
 data "aws_caller_identity" "current" {}
 
 locals {
-  resource_prefix = "${var.service_name}-setup"
+  resource_prefix         = "${var.service_name}-setup"
+  service_resource_prefix = "${var.service_name}-${var.stage}"
+}
+
+module "s3_bucket_audit_log" {
+  source          = "../../../modules/s3/bucket/audit_log"
+  resource_prefix = "${local.service_resource_prefix}"
 }
 
 module "s3_bucket_build_artifacts" {
@@ -68,4 +75,12 @@ output "s3_bucket_artifacts_arn" {
 
 output "codebuild_destroy_name" {
   value = "${module.codebuild_destroy.name}"
+}
+
+output "s3_bucket_audit_log_id" {
+  value = "${module.s3_bucket_audit_log.id}"
+}
+
+output "s3_bucket_audit_log_bucket_domain_name" {
+  value = "${module.s3_bucket_audit_log.bucket_domain_name}"
 }

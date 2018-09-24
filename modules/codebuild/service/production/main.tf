@@ -3,6 +3,8 @@ variable "iam_role_build_arn" {}
 variable "s3_bucket_source_arn" {}
 variable "s3_bucket_terraform_state_id" {}
 variable "service_resource_prefix" {}
+variable "s3_bucket_audit_log_id" {}
+variable "s3_bucket_audit_log_bucket_domain_name" {}
 
 resource "aws_codebuild_project" "service_production" {
   name = "${var.resource_prefix}-production-codebuild-01"
@@ -26,6 +28,16 @@ resource "aws_codebuild_project" "service_production" {
     environment_variable {
       "name"  = "TF_VAR_resource_prefix"
       "value" = "${var.service_resource_prefix}"
+    }
+
+    environment_variable {
+      "name"  = "TF_VAR_s3_bucket_audit_log_id"
+      "value" = "${var.s3_bucket_audit_log_id}"
+    }
+
+    environment_variable {
+      "name"  = "TF_VAR_s3_bucket_audit_log_bucket_domain_name"
+      "value" = "${var.s3_bucket_audit_log_bucket_domain_name}"
     }
   }
 

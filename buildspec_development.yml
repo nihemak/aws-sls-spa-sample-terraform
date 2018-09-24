@@ -36,12 +36,14 @@ phases:
       - terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" -backend-config="key=${TF_VAR_tfstate_setup_key}"
       - terraform plan -var "codecommit_api_branch=$codecommit_api_branch" -var "codecommit_web_branch=$codecommit_web_branch"
       - terraform apply -auto-approve -var "codecommit_api_branch=$codecommit_api_branch" -var "codecommit_web_branch=$codecommit_web_branch"
+      - s3_bucket_audit_log_id=`terraform output s3_bucket_audit_log_id`
+      - s3_bucket_audit_log_bucket_domain_name=`terraform output s3_bucket_audit_log_bucket_domain_name`
       - cd -
       # base
       - cd environments/service/base/pre/
       - terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" -backend-config="key=${TF_VAR_tfstate_service_base_pre_key}"
-      - terraform plan -var "resource_prefix=${TF_VAR_service_name}-${TF_VAR_stage}"
-      - terraform apply -auto-approve -var "resource_prefix=${TF_VAR_service_name}-${TF_VAR_stage}"
+      - terraform plan -var "resource_prefix=${TF_VAR_service_name}-${TF_VAR_stage}" -var "s3_bucket_audit_log_id=${s3_bucket_audit_log_id}" -var "s3_bucket_audit_log_bucket_domain_name=${s3_bucket_audit_log_bucket_domain_name}"
+      - terraform apply -auto-approve -var "resource_prefix=${TF_VAR_service_name}-${TF_VAR_stage}" -var "s3_bucket_audit_log_id=${s3_bucket_audit_log_id}" -var "s3_bucket_audit_log_bucket_domain_name=${s3_bucket_audit_log_bucket_domain_name}"
       - cloudformation_api_stack=`terraform output cloudformation_api_stack`
       - firehose_delivery_stream_arn=`terraform output firehose_delivery_stream_arn`
       - iam_role_api_log_cloudwatchlogs_to_s3_policy_arn=`terraform output iam_role_api_log_cloudwatchlogs_to_s3_policy_arn`
