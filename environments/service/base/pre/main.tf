@@ -4,6 +4,7 @@ variable "tfstate_setup_key" {}
 variable "resource_prefix" {}
 variable "s3_bucket_audit_log_id" {}
 variable "s3_bucket_audit_log_bucket_domain_name" {}
+variable "s3_bucket_api_log_arn" {}
 
 provider "aws" {}
 
@@ -54,19 +55,11 @@ module "waf_acl" {
   resource_prefix = "${local.resource_prefix}"
 }
 
-## s3 bucket api log
-
-module "s3_bucket_api_log" {
-  source            = "../../../../modules/s3/bucket/api_log"
-  resource_prefix   = "${local.resource_prefix}"
-  logging_bucket_id = "${var.s3_bucket_audit_log_id}"
-}
-
 module "iam_role_api_log_firehose_to_s3" {
   source          = "../../../../modules/iam/api_log_firehose_to_s3"
   path            = "../../../../modules/iam/api_log_firehose_to_s3"
   resource_prefix = "${local.resource_prefix}"
-  s3_bucket_arn   = "${module.s3_bucket_api_log.arn}"
+  s3_bucket_arn   = "${var.s3_bucket_api_log_arn}"
 }
 
 resource "aws_kinesis_firehose_delivery_stream" "api_log" {
@@ -75,7 +68,7 @@ resource "aws_kinesis_firehose_delivery_stream" "api_log" {
 
   s3_configuration {
     role_arn           = "${module.iam_role_api_log_firehose_to_s3.arn}"
-    bucket_arn         = "${module.s3_bucket_api_log.arn}"
+    bucket_arn         = "${var.s3_bucket_api_log_arn}"
     compression_format = "GZIP"
   }
 }

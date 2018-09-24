@@ -40,6 +40,12 @@ module "iam_role_build_service" {
   resource_prefix = "${local.resource_prefix}"
 }
 
+module "s3_bucket_api_log" {
+  source            = "../../../modules/s3/bucket/api_log"
+  resource_prefix   = "${local.service_resource_prefix}"
+  logging_bucket_id = "${module.s3_bucket_audit_log.id}"
+}
+
 module "codebuild_destroy" {
   source                       = "../../../modules/codebuild/destroy_service/development"
   codecommit_repository        = "${var.codecommit_infra_repository}"
@@ -83,4 +89,8 @@ output "s3_bucket_audit_log_id" {
 
 output "s3_bucket_audit_log_bucket_domain_name" {
   value = "${module.s3_bucket_audit_log.bucket_domain_name}"
+}
+
+output "s3_bucket_api_log_arn" {
+  value = "${module.s3_bucket_api_log.arn}"
 }

@@ -5,6 +5,7 @@ variable "s3_bucket_terraform_state_id" {}
 variable "service_resource_prefix" {}
 variable "s3_bucket_audit_log_id" {}
 variable "s3_bucket_audit_log_bucket_domain_name" {}
+variable "s3_bucket_api_log_arn" {}
 
 resource "aws_codebuild_project" "service_production" {
   name = "${var.resource_prefix}-production-codebuild-01"
@@ -38,6 +39,11 @@ resource "aws_codebuild_project" "service_production" {
     environment_variable {
       "name"  = "TF_VAR_s3_bucket_audit_log_bucket_domain_name"
       "value" = "${var.s3_bucket_audit_log_bucket_domain_name}"
+    }
+
+    environment_variable {
+      "name"  = "TF_VAR_s3_bucket_api_log_arn"
+      "value" = "${var.s3_bucket_api_log_arn}"
     }
   }
 

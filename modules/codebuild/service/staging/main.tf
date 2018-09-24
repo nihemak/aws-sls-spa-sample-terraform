@@ -6,6 +6,7 @@ variable "s3_bucket_source_id" {}
 variable "service_resource_prefix" {}
 variable "s3_bucket_audit_log_id" {}
 variable "s3_bucket_audit_log_bucket_domain_name" {}
+variable "s3_bucket_api_log_arn" {}
 
 resource "aws_codebuild_project" "service_staging" {
   name = "${var.resource_prefix}-staging-codebuild-01"
@@ -39,6 +40,11 @@ resource "aws_codebuild_project" "service_staging" {
     environment_variable {
       "name"  = "TF_VAR_s3_bucket_audit_log_bucket_domain_name"
       "value" = "${var.s3_bucket_audit_log_bucket_domain_name}"
+    }
+
+    environment_variable {
+      "name"  = "TF_VAR_s3_bucket_api_log_arn"
+      "value" = "${var.s3_bucket_api_log_arn}"
     }
   }
 
