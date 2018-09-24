@@ -68,8 +68,8 @@ phases:
       # base
       - cd environments/service/base/pre/
       - terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" -backend-config="key=${TF_VAR_tfstate_service_base_pre_key}"
-      - terraform plan -destroy
-      - terraform destroy -auto-approve
+      - terraform plan -destroy -var "resource_prefix=${TF_VAR_service_name}-${TF_VAR_stage}"
+      - terraform destroy -auto-approve -var "resource_prefix=${TF_VAR_service_name}-${TF_VAR_stage}"
       - cd -
 
   post_build:

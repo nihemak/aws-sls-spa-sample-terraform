@@ -1,6 +1,7 @@
 variable "stage" {}
 variable "s3_bucket_terraform_state_id" {}
 variable "tfstate_setup_key" {}
+variable "resource_prefix" {}
 
 provider "aws" {}
 
@@ -26,7 +27,7 @@ data "terraform_remote_state" "setup" {
 
 locals {
   service_name             = "${data.terraform_remote_state.setup.service_name}"
-  resource_prefix          = "${local.service_name}-${var.stage}"
+  resource_prefix          = "${var.resource_prefix}"
   cloudformation_api_stack = "${local.service_name}-api-${var.stage}"
 }
 

@@ -4,6 +4,8 @@ variable "codecommit_infra_repository" {}
 variable "codecommit_api_repository" {}
 variable "codecommit_web_repository" {}
 variable "approval_sns_topic_arn" {}
+variable "stage_staging" {}
+variable "stage_production" {}
 
 provider "aws" {}
 
@@ -39,6 +41,7 @@ module "codebuild_staging" {
   resource_prefix              = "${local.resource_prefix}"
   iam_role_build_arn           = "${module.iam_role_build_service.arn}"
   s3_bucket_terraform_state_id = "${var.s3_bucket_terraform_state_id}"
+  service_resource_prefix      = "${var.service_name}-${var.stage_staging}"
 }
 
 module "codebuild_production" {
@@ -47,6 +50,7 @@ module "codebuild_production" {
   resource_prefix              = "${local.resource_prefix}"
   iam_role_build_arn           = "${module.iam_role_build_service.arn}"
   s3_bucket_terraform_state_id = "${var.s3_bucket_terraform_state_id}"
+  service_resource_prefix      = "${var.service_name}-${var.stage_production}"
 }
 
 module "iam_role_pipeline_build" {

@@ -4,6 +4,7 @@ variable "codecommit_repository" {}
 variable "s3_bucket_terraform_state_id" {}
 variable "codecommit_api_branch" {}
 variable "codecommit_web_branch" {}
+variable "service_name" {}
 
 resource "aws_codebuild_project" "destroy_service_development" {
   name = "${var.resource_prefix}-destroy-service-codebuild-01"
@@ -32,6 +33,11 @@ resource "aws_codebuild_project" "destroy_service_development" {
     environment_variable {
       "name"  = "codecommit_web_branch"
       "value" = "${var.codecommit_web_branch}"
+    }
+
+    environment_variable {
+      "name"  = "service_name"
+      "value" = "${var.service_name}"
     }
   }
 

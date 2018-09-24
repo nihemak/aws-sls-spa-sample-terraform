@@ -2,6 +2,7 @@ variable "resource_prefix" {}
 variable "iam_role_build_arn" {}
 variable "s3_bucket_source_arn" {}
 variable "s3_bucket_terraform_state_id" {}
+variable "service_resource_prefix" {}
 
 resource "aws_codebuild_project" "service_production" {
   name = "${var.resource_prefix}-production-codebuild-01"
@@ -20,6 +21,11 @@ resource "aws_codebuild_project" "service_production" {
     environment_variable {
       "name"  = "TF_VAR_s3_bucket_terraform_state_id"
       "value" = "${var.s3_bucket_terraform_state_id}"
+    }
+
+    environment_variable {
+      "name"  = "TF_VAR_resource_prefix"
+      "value" = "${var.service_resource_prefix}"
     }
   }
 
