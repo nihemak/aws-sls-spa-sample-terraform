@@ -17,12 +17,7 @@ phases:
 
   pre_build:
     commands:
-      # Workaround until TF supports creds via Task Roles when running on ECS or CodeBuild
-      # See: https://github.com/hashicorp/terraform/issues/8746
-      - export AWS_RAW_CRED=$(curl --silent http://169.254.170.2:80$AWS_CONTAINER_CREDENTIALS_RELATIVE_URI)
-      - export AWS_ACCESS_KEY_ID=$(echo $AWS_RAW_CRED | jq -r '.AccessKeyId')
-      - export AWS_SECRET_ACCESS_KEY=$(echo $AWS_RAW_CRED | jq -r '.SecretAccessKey')
-      - export AWS_SESSION_TOKEN=$(echo $AWS_RAW_CRED | jq -r '.Token')
+      - source ./bin/export_aws_settings.sh
 
   build:
     commands:
