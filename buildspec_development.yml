@@ -17,7 +17,7 @@ phases:
 
   pre_build:
     commands:
-      - source ./bin/export_aws_settings.sh
+      - . ./bin/export_aws_settings.sh
 
   build:
     commands:
