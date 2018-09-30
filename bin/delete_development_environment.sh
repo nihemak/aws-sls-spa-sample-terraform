@@ -110,7 +110,7 @@ cd environments/service/base/pre/ || exit 99
 
 terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" \
                -backend-config="key=${TF_VAR_tfstate_service_base_pre_key}"
-resource_prefix="${TF_VAR_service_name:?}-${TF_VAR_stage:?}"
+resource_prefix="${service_name:?}-${TF_VAR_stage:?}"
 terraform plan -destroy \
                -var "resource_prefix=${resource_prefix}" \
                -var "s3_bucket_audit_log_id=${s3_bucket_audit_log_id}" \
