@@ -24,45 +24,7 @@ phases:
 
   build:
     commands:
-      # base
-      - cd environments/service/base/pre/
-      - terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" -backend-config="key=${TF_VAR_tfstate_service_base_pre_key}"
-      - terraform plan
-      - terraform apply -auto-approve
-      - cloudformation_api_stack=`terraform output cloudformation_api_stack`
-      - firehose_delivery_stream_arn=`terraform output firehose_delivery_stream_arn`
-      - iam_role_api_log_cloudwatchlogs_to_s3_policy_arn=`terraform output iam_role_api_log_cloudwatchlogs_to_s3_policy_arn`
-      - cd -
-      # api
-      - cd environments/service/api/production/
-      - terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" -backend-config="key=${TF_VAR_tfstate_service_api_production_key}"
-      - terraform plan
-      - terraform apply -auto-approve
-      - codebuild_name=`terraform output codebuild_api_name`
-      - cd -
-      - ./bin/exec_codebuild.sh "$codebuild_name"
-      - export TF_VAR_apigw_api_id=$(aws cloudformation describe-stack-resource --stack-name "${cloudformation_api_stack}" --logical-resource-id ApiGatewayRestApi | jq -r '.StackResourceDetail.PhysicalResourceId')
-      - ./bin/mapping_logs_firehose.sh "$cloudformation_api_stack" "$firehose_delivery_stream_arn" "$iam_role_api_log_cloudwatchlogs_to_s3_policy_arn"
-      # base
-      - cd environments/service/base/after_api
-      - terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" -backend-config="key=${TF_VAR_tfstate_service_base_after_api_key}"
-      - terraform plan
-      - terraform apply -auto-approve
-      - cd -
-      # web
-      - cd environments/service/web/production/
-      - terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" -backend-config="key=${TF_VAR_tfstate_service_web_production_key}"
-      - terraform plan
-      - terraform apply -auto-approve
-      - codebuild_name=`terraform output codebuild_web_name`
-      - cd -
-      - ./bin/exec_codebuild.sh "$codebuild_name"
-      # pipeline
-      - cd environments/service/pipeline/
-      - terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" -backend-config="key=${TF_VAR_tfstate_service_pipeline_key}"
-      - terraform plan
-      - terraform apply -auto-approve
-      - cd -
+      - ./bin/create_production_environment.sh
 
   post_build:
     commands:
