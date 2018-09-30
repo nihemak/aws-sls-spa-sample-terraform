@@ -21,52 +21,7 @@ phases:
 
   build:
     commands:
-      # info
-      - cd environments/service/web/development/
-      - terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" -backend-config="key=${TF_VAR_tfstate_service_web_key}"
-      - codebuild_destroy_web_name=`terraform output codebuild_destroy_web_name`
-      - cd -
-      - cd environments/service/api/development/
-      - terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" -backend-config="key=${TF_VAR_tfstate_service_api_key}"
-      - codebuild_destroy_api_name=`terraform output codebuild_destroy_api_name`
-      - cd -
-      - cd environments/service/base/pre/
-      - terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" -backend-config="key=${TF_VAR_tfstate_service_base_pre_key}"
-      - cloudformation_api_stack=`terraform output cloudformation_api_stack`
-      - export TF_VAR_apigw_api_id=$(aws cloudformation describe-stack-resource --stack-name "${cloudformation_api_stack}" --logical-resource-id ApiGatewayRestApi | jq -r '.StackResourceDetail.PhysicalResourceId')
-      - cd -
-      - cd environments/setup/development
-      - terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" -backend-config="key=${TF_VAR_tfstate_setup_key}"
-      - s3_bucket_audit_log_id=`terraform output s3_bucket_audit_log_id`
-      - s3_bucket_audit_log_bucket_domain_name=`terraform output s3_bucket_audit_log_bucket_domain_name`
-      - s3_bucket_api_log_arn=`terraform output s3_bucket_api_log_arn`
-      - cd -
-      # web
-      - ./bin/exec_codebuild.sh "$codebuild_destroy_web_name" "$codecommit_web_branch"
-      - cd environments/service/web/development/
-      - terraform plan -destroy
-      - terraform destroy -auto-approve
-      - cd -
-      # base
-      - cd environments/service/base/after_api
-      - terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" -backend-config="key=${TF_VAR_tfstate_service_base_after_api_key}"
-      - terraform plan -destroy
-      - terraform destroy -auto-approve
-      - cd -
-      # api
-      - ./bin/mapping_logs_delete_firehose.sh "$cloudformation_api_stack"
-      - ./bin/exec_codebuild.sh "$codebuild_destroy_api_name" "$codecommit_api_branch"
-      - cd environments/service/api/development/
-      - terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" -backend-config="key=${TF_VAR_tfstate_service_api_key}"
-      - terraform plan -destroy
-      - terraform destroy -auto-approve
-      - cd -
-      # base
-      - cd environments/service/base/pre/
-      - terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" -backend-config="key=${TF_VAR_tfstate_service_base_pre_key}"
-      - terraform plan -destroy -var "resource_prefix=${TF_VAR_service_name}-${TF_VAR_stage}" -var "s3_bucket_audit_log_id=${s3_bucket_audit_log_id}" -var "s3_bucket_audit_log_bucket_domain_name=${s3_bucket_audit_log_bucket_domain_name}" -var "s3_bucket_api_log_arn=${s3_bucket_api_log_arn}"
-      - terraform destroy -auto-approve -var "resource_prefix=${TF_VAR_service_name}-${TF_VAR_stage}" -var "s3_bucket_audit_log_id=${s3_bucket_audit_log_id}" -var "s3_bucket_audit_log_bucket_domain_name=${s3_bucket_audit_log_bucket_domain_name}" -var "s3_bucket_api_log_arn=${s3_bucket_api_log_arn}"
-      - cd -
+      - ./bin/delete_development_environment.sh
 
   post_build:
     commands:
