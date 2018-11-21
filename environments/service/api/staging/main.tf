@@ -64,7 +64,7 @@ module "codebuild_api" {
   resource_prefix        = "${local.resource_prefix}"
   stage                  = "${var.stage}"
   iam_role_exec_api_arn  = "${data.terraform_remote_state.service_base_pre.iam_role_exec_api_arn}"
-  cognito_pool_arn       = "${data.terraform_remote_state.service_base_pre.cognito_pool_api_arn}"
+  cognito_pool_id        = "${data.terraform_remote_state.service_base_pre.cognito_pool_api_id}"
   cors                   = "${data.terraform_remote_state.service_base_pre.web_base_url}"
   service_name           = "${data.terraform_remote_state.setup.service_name}"
 }

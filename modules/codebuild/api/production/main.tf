@@ -1,6 +1,6 @@
 variable "resource_prefix" {}
 variable "stage" {}
-variable "cognito_pool_arn" {}
+variable "cognito_pool_id" {}
 variable "iam_role_exec_api_arn" {}
 variable "cors" {}
 variable "s3_bucket_build_api_id" {}
@@ -42,8 +42,8 @@ resource "aws_codebuild_project" "api" {
     }
 
     environment_variable {
-      "name"  = "COGNITO_POOL_ARN"
-      "value" = "${var.cognito_pool_arn}"
+      "name"  = "USER_POOL_ID"
+      "value" = "${var.cognito_pool_id}"
     }
 
     environment_variable {
