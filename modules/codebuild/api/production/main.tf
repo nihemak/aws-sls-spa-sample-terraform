@@ -27,6 +27,11 @@ resource "aws_codebuild_project" "api" {
     }
 
     environment_variable {
+      "name"  = "REGION"
+      "value" = "ap-northeast-1"
+    }
+
+    environment_variable {
       "name"  = "LAMBDA_ROLE"
       "value" = "${var.iam_role_exec_api_arn}"
     }
