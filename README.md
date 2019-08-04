@@ -23,135 +23,51 @@ CodePipeline:
 
 ![CodePipeline](docs/build_flow_codepipeline.png)
 
-## Getting Started (Development)
+## Getting Started
 
 Migrate a Github repository to AWS CodeCommit.
 
-Create an AWS CodeCommit Repository:
+* Create an AWS CodeCommit Repository
+* Clone the Repository and Push to the AWS CodeCommit Repository
 
 ```bash
 # spa infra repository...
-$ aws codecommit create-repository --repository-name foobar-sample-spa-infra
-# spa api repository...
-$ aws codecommit create-repository --repository-name foobar-sample-spa-api
-# spa web repository...
-$ aws codecommit create-repository --repository-name foobar-sample-spa-web
-```
-
-Clone the Repository and Push to the AWS CodeCommit Repository:
-
-```bash
-# spa infra repository...
-$ git clone --mirror https://github.com/nihemak/aws-sls-spa-sample-terraform.git sample-spa-infra
+$ git clone https://github.com/nihemak/aws-sls-spa-sample-terraform.git sample-spa-infra
 $ cd sample-spa-infra
+$ aws cloudformation validate-template \
+    --template-body file://bootstrap/CodeStore.cfn.yml
+$ aws cloudformation create-stack \
+    --stack-name foobar-sample-spa-CodeStore \
+    --template-body file://bootstrap/CodeStore.cfn.yml
 $ git push ssh://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/foobar-sample-spa-infra --all
-$ git push ssh://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/foobar-sample-spa-infra --tags
 $ cd ..
 # spa api repository...
-$ git clone --mirror https://github.com/nihemak/aws-sls-spa-sample-api.git sample-spa-api
+$ git clone https://github.com/nihemak/aws-sls-spa-sample-api.git sample-spa-api
 $ cd sample-spa-api
 $ git push ssh://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/foobar-sample-spa-api --all
-$ git push ssh://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/foobar-sample-spa-api --tags
 $ cd ..
 # spa web repository...
-$ git clone --mirror https://github.com/nihemak/aws-sls-spa-sample-web.git sample-spa-web
+$ git clone https://github.com/nihemak/aws-sls-spa-sample-web.git sample-spa-web
 $ cd sample-spa-web
 $ git push ssh://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/foobar-sample-spa-web --all
-$ git push ssh://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/foobar-sample-spa-web --tags
 $ cd ..
 ```
 
-Create S3 bucket for Terraform state saving:
+### Environment: Development
+
+* Create S3 bucket for Terraform state saving
+* Create CodeBuild's service role for development
+* Create CodeBuild for development
 
 ```bash
-$ aws s3 mb s3://foobar-sample-spa-dev-terraform-state --region ap-northeast-1
-$ aws s3api put-bucket-versioning --bucket foobar-sample-spa-dev-terraform-state \
-                                  --versioning-configuration Status=Enabled
-```
-
-Create CodeBuild's service role for development:
-
-```bash
-$ cat Trust-Policy.json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "Service": "codebuild.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole"
-        }
-    ]
-}
-$ aws iam create-role --role-name foobar-sample-spa-dev-codebuild \
-                      --assume-role-policy-document file://Trust-Policy.json
-$ aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AdministratorAccess \
-                             --role-name foobar-sample-spa-dev-codebuild
-```
-
-Create CodeBuild for development:
-
-```bash
-$ cat Source.json
-{
-  "type": "CODECOMMIT",
-  "location": "https://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/foobar-sample-spa-infra",
-  "buildspec": "buildspec_development.yml"
-}
-$ cat Artifacts.json
-{
-  "type": "NO_ARTIFACTS"
-}
-$ cat Environment.json
-{
-  "type": "LINUX_CONTAINER",
-  "image": "aws/codebuild/ubuntu-base:14.04",
-  "computeType": "BUILD_GENERAL1_SMALL",
-  "environmentVariables": [
-    {
-      "name": "TF_VAR_service_name",
-      "value": "foobar-sample-spa",
-      "type": "PLAINTEXT"
-    },
-    {
-      "name": "TF_VAR_s3_bucket_terraform_state_id",
-      "value": "foobar-sample-spa-dev-terraform-state",
-      "type": "PLAINTEXT"
-    },
-    {
-      "name": "TF_VAR_codecommit_infra_repository",
-      "value": "foobar-sample-spa-infra",
-      "type": "PLAINTEXT"
-    },
-    {
-      "name": "TF_VAR_codecommit_api_repository",
-      "value": "foobar-sample-spa-api",
-      "type": "PLAINTEXT"
-    },
-    {
-      "name": "TF_VAR_codecommit_web_repository",
-      "value": "foobar-sample-spa-web",
-      "type": "PLAINTEXT"
-    },
-    {
-      "name": "codecommit_api_branch",
-      "value": "<branch of api>",
-      "type": "PLAINTEXT"
-    },
-    {
-      "name": "codecommit_web_branch",
-      "value": "<branch of web>",
-      "type": "PLAINTEXT"
-    }
-  ]
-}
-$ aws codebuild create-project --name foobar-sample-spa-dev \
-                               --source file://Source.json \
-                               --artifacts file://Artifacts.json \
-                               --environment file://Environment.json \
-                               --service-role arn:aws:iam::<account-id>:role/foobar-sample-spa-dev-codebuild
+$ aws cloudformation validate-template \
+    --template-body file://bootstrap/EnvDev.cfn.yml
+$ aws cloudformation create-stack \
+    --stack-name foobar-sample-spa-EnvDev \
+    --capabilities CAPABILITY_NAMED_IAM \
+    --parameters \
+      ParameterKey=CodeCommitStackName,ParameterValue=foobar-sample-spa-CodeStore \
+    --template-body file://bootstrap/EnvDev.cfn.yml
 ```
 
 Build development.
@@ -159,7 +75,21 @@ Build development.
 Run CodeBuild to build infrastructure and api and web with Terraform:
 
 ```bash
-$ aws codebuild start-build --project-name foobar-sample-spa-dev --source-version <branch of infrastructure>
+$ CODEBUILD_ID=$(aws codebuild start-build --project-name foobar-sample-spa-dev --source-version master | tr -d "\n" | jq -r '.build.id')
+$ echo "started.. id is ${CODEBUILD_ID}"
+$ while true
+do
+  sleep 10s
+  STATUS=$(aws codebuild batch-get-builds --ids "${CODEBUILD_ID}" | tr -d "\n" | jq -r '.builds[].buildStatus')
+  echo "..status is ${STATUS}."
+  if [ "${STATUS}" != "IN_PROGRESS" ]; then
+    if [ "${STATUS}" != "SUCCEEDED" ]; then
+      echo "faild."
+    fi
+    echo "done."
+    break
+  fi
+done
 ```
 
 To delete the environment, execute the following:
@@ -168,43 +98,7 @@ To delete the environment, execute the following:
 $ aws codebuild start-build --project-name foobar-sample-spa-setup-destroy-service-codebuild-01 --source-version <branch of infrastructure>
 ```
 
-## Getting Started (Staging and Production)
-
-Migrate a Github repository to AWS CodeCommit.
-
-Create an AWS CodeCommit Repository:
-
-```bash
-# spa infra repository...
-$ aws codecommit create-repository --repository-name foobar-sample-spa-infra
-# spa api repository...
-$ aws codecommit create-repository --repository-name foobar-sample-spa-api
-# spa web repository...
-$ aws codecommit create-repository --repository-name foobar-sample-spa-web
-```
-
-Clone the Repository and Push to the AWS CodeCommit Repository:
-
-```bash
-# spa infra repository...
-$ git clone --mirror https://github.com/nihemak/aws-sls-spa-sample-terraform.git sample-spa-infra
-$ cd sample-spa-infra
-$ git push ssh://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/foobar-sample-spa-infra --all
-$ git push ssh://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/foobar-sample-spa-infra --tags
-$ cd ..
-# spa api repository...
-$ git clone --mirror https://github.com/nihemak/aws-sls-spa-sample-api.git sample-spa-api
-$ cd sample-spa-api
-$ git push ssh://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/foobar-sample-spa-api --all
-$ git push ssh://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/foobar-sample-spa-api --tags
-$ cd ..
-# spa web repository...
-$ git clone --mirror https://github.com/nihemak/aws-sls-spa-sample-web.git sample-spa-web
-$ cd sample-spa-web
-$ git push ssh://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/foobar-sample-spa-web --all
-$ git push ssh://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/foobar-sample-spa-web --tags
-$ cd ..
-```
+### Environment: Staging and Production
 
 Setup Required for Build infrastructure with AWS CodeBuild.
 
@@ -220,92 +114,19 @@ $ aws sns confirm-subscription --topic-arn arn:aws:sns:ap-northeast-1:<account-i
                                --token <token value>
 ```
 
-Create S3 bucket for Terraform state saving:
+* Create S3 bucket for Terraform state saving
+* Create CodeBuild's service role for setup
+* Create CodeBuild for setup
 
 ```bash
-$ aws s3 mb s3://foobar-sample-spa-terraform-state --region ap-northeast-1
-$ aws s3api put-bucket-versioning --bucket foobar-sample-spa-terraform-state \
-                                  --versioning-configuration Status=Enabled
-```
-
-Create CodeBuild's service role for setup:
-
-```bash
-$ cat Trust-Policy.json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "Service": "codebuild.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole"
-        }
-    ]
-}
-$ aws iam create-role --role-name foobar-sample-spa-setup-codebuild \
-                      --assume-role-policy-document file://Trust-Policy.json
-$ aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AdministratorAccess \
-                             --role-name foobar-sample-spa-setup-codebuild
-```
-
-Create CodeBuild for setup:
-
-```bash
-$ cat Source.json
-{
-  "type": "CODECOMMIT",
-  "location": "https://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/foobar-sample-spa-infra",
-  "buildspec": "buildspec_setup.yml"
-}
-$ cat Artifacts.json
-{
-  "type": "NO_ARTIFACTS"
-}
-$ cat Environment.json
-{
-  "type": "LINUX_CONTAINER",
-  "image": "aws/codebuild/ubuntu-base:14.04",
-  "computeType": "BUILD_GENERAL1_SMALL",
-  "environmentVariables": [
-    {
-      "name": "TF_VAR_service_name",
-      "value": "foobar-sample-spa",
-      "type": "PLAINTEXT"
-    },
-    {
-      "name": "TF_VAR_approval_sns_topic_arn",
-      "value": "arn:aws:sns:ap-northeast-1:<account-id>:foobar-sample-spa-approval-topic",
-      "type": "PLAINTEXT"
-    },
-    {
-      "name": "TF_VAR_s3_bucket_terraform_state_id",
-      "value": "foobar-sample-spa-terraform-state",
-      "type": "PLAINTEXT"
-    },
-    {
-      "name": "TF_VAR_codecommit_infra_repository",
-      "value": "foobar-sample-spa-infra",
-      "type": "PLAINTEXT"
-    },
-    {
-      "name": "TF_VAR_codecommit_api_repository",
-      "value": "foobar-sample-spa-api",
-      "type": "PLAINTEXT"
-    },
-    {
-      "name": "TF_VAR_codecommit_web_repository",
-      "value": "foobar-sample-spa-web",
-      "type": "PLAINTEXT"
-    }
-  ]
-}
-$ aws codebuild create-project --name foobar-sample-spa-setup \
-                               --source file://Source.json \
-                               --artifacts file://Artifacts.json \
-                               --environment file://Environment.json \
-                               --service-role arn:aws:iam::<account-id>:role/foobar-sample-spa-setup-codebuild
+$ aws cloudformation validate-template \
+    --template-body file://bootstrap/EnvStgPrd.cfn.yml
+$ aws cloudformation create-stack \
+    --stack-name foobar-sample-spa-EnvStgPrd \
+    --capabilities CAPABILITY_NAMED_IAM \
+    --parameters \
+      ParameterKey=CodeCommitStackName,ParameterValue=foobar-sample-spa-CodeStore \
+    --template-body file://bootstrap/EnvStgPrd.cfn.yml
 ```
 
 Setup and Build infrastructure.
@@ -313,5 +134,19 @@ Setup and Build infrastructure.
 Run CodeBuild to build infrastructure with Terraform:
 
 ```bash
-$ aws codebuild start-build --project-name foobar-sample-spa-setup
+$ CODEBUILD_ID=$(aws codebuild start-build --project-name foobar-sample-spa-setup --source-version master | tr -d "\n" | jq -r '.build.id')
+$ echo "started.. id is ${CODEBUILD_ID}"
+$ while true
+do
+  sleep 10s
+  STATUS=$(aws codebuild batch-get-builds --ids "${CODEBUILD_ID}" | tr -d "\n" | jq -r '.builds[].buildStatus')
+  echo "..status is ${STATUS}."
+  if [ "${STATUS}" != "IN_PROGRESS" ]; then
+    if [ "${STATUS}" != "SUCCEEDED" ]; then
+      echo "faild."
+    fi
+    echo "done."
+    break
+  fi
+done
 ```

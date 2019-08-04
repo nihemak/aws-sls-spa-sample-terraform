@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Development Environment Template
+Parameters:
+  CodeCommitStackName:
+    Type: String
+Resources:
+  StateS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: foobar-sample-spa-dev-terraform-state
+      VersioningConfiguration:
+        Status: Enabled
+  BuildServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codebuild.amazonaws.com
+            Action:
+                - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+      RoleName: foobar-sample-spa-dev-codebuild
+  BuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: foobar-sample-spa-dev
+      ServiceRole: !Ref BuildServiceRole
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/ubuntu-base:14.04
+        EnvironmentVariables:
+          - Name: TF_VAR_service_name
+            Value: foobar-sample-spa
+            Type: PLAINTEXT
+          - Name: TF_VAR_s3_bucket_terraform_state_id
+            Value: !Ref StateS3Bucket
+            Type: PLAINTEXT
+          - Name: TF_VAR_codecommit_infra_repository
+            Value:
+              Fn::ImportValue: !Sub ${CodeCommitStackName}-InfraCodeCommitRepoName
+            Type: PLAINTEXT
+          - Name: TF_VAR_codecommit_api_repository
+            Value:
+              Fn::ImportValue: !Sub ${CodeCommitStackName}-ApiCodeCommitRepoName
+            Type: PLAINTEXT
+          - Name: TF_VAR_codecommit_web_repository
+            Value:
+              Fn::ImportValue: !Sub ${CodeCommitStackName}-WebCodeCommitRepoName
+            Type: PLAINTEXT
+          - Name: codecommit_api_branch
+            Value: master
+            Type: PLAINTEXT
+          - Name: codecommit_web_branch
+            Value: master
+            Type: PLAINTEXT
+      Source:
+        Type: CODECOMMIT
+        Location:
+          Fn::ImportValue: !Sub ${CodeCommitStackName}-InfraCodeCommitRepoCloneUrlHttp
+        BuildSpec: buildspec_development.yml
