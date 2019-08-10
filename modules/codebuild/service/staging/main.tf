@@ -19,7 +19,7 @@ resource "aws_codebuild_project" "service_staging" {
 
   environment {
     compute_type = "BUILD_GENERAL1_SMALL"
-    image        = "aws/codebuild/ubuntu-base:14.04"
+    image        = "aws/codebuild/standard:2.0"
     type         = "LINUX_CONTAINER"
 
     environment_variable {

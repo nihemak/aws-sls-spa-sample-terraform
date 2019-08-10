@@ -35,7 +35,7 @@ Resources:
       Environment:
         Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/ubuntu-base:14.04
+        Image: aws/codebuild/standard:2.0
         EnvironmentVariables:
           - Name: TF_VAR_service_name
             Value: foobar-sample-spa
