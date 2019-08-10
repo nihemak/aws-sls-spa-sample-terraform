@@ -51,6 +51,7 @@ $ git clone https://github.com/nihemak/aws-sls-spa-sample-web.git sample-spa-web
 $ cd sample-spa-web
 $ git push ssh://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/foobar-sample-spa-web --all
 $ cd ..
+$ cd sample-spa-infra
 ```
 
 ### Environment: Development
@@ -67,6 +68,8 @@ $ aws cloudformation create-stack \
     --capabilities CAPABILITY_NAMED_IAM \
     --parameters \
       ParameterKey=CodeCommitStackName,ParameterValue=foobar-sample-spa-CodeStore \
+      ParameterKey=ApiBranch,ParameterValue=master \
+      ParameterKey=WebBranch,ParameterValue=master \
     --template-body file://bootstrap/EnvDev.cfn.yml
 ```
 
