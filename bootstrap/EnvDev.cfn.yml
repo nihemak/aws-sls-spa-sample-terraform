@@ -3,6 +3,10 @@ Description: Development Environment Template
 Parameters:
   CodeCommitStackName:
     Type: String
+  ApiBranch:
+    Type: String
+  WebBranch:
+    Type: String
 Resources:
   StateS3Bucket:
     Type: AWS::S3::Bucket
@@ -56,10 +60,10 @@ Resources:
               Fn::ImportValue: !Sub ${CodeCommitStackName}-WebCodeCommitRepoName
             Type: PLAINTEXT
           - Name: codecommit_api_branch
-            Value: master
+            Value: !Sub ${ApiBranch}
             Type: PLAINTEXT
           - Name: codecommit_web_branch
-            Value: master
+            Value: !Sub ${WebBranch}
             Type: PLAINTEXT
       Source:
         Type: CODECOMMIT
