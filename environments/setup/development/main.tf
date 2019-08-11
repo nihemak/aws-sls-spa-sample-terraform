@@ -20,7 +20,7 @@ terraform {
 data "aws_caller_identity" "current" {}
 
 locals {
-  resource_prefix         = "${var.service_name}-setup"
+  resource_prefix         = "${var.service_name}-${var.stage}-setup"
   service_resource_prefix = "${var.service_name}-${var.stage}"
 }
 

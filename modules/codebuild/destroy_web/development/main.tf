@@ -3,8 +3,8 @@ variable "iam_role_build_web_arn" {}
 variable "s3_bucket_web_id" {}
 variable "codecommit_repository" {}
 
-resource "aws_codebuild_project" "destory_web" {
-  name = "${var.resource_prefix}-destory-web-codebuild-01"
+resource "aws_codebuild_project" "destroy_web" {
+  name = "${var.resource_prefix}-destroy-web-codebuild-01"
 
   source {
     type      = "CODECOMMIT"
@@ -31,5 +31,5 @@ resource "aws_codebuild_project" "destory_web" {
 }
 
 output "name" {
-  value = "${aws_codebuild_project.destory_web.name}"
+  value = "${aws_codebuild_project.destroy_web.name}"
 }
