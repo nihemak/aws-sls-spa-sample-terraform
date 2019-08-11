@@ -23,6 +23,31 @@ resource "aws_cloudfront_distribution" "api" {
   enabled = true
   comment = "${var.resource_prefix}-api"
 
+  custom_error_response {
+    error_code            = 500
+    error_caching_min_ttl = 1
+  }
+
+  custom_error_response {
+    error_code            = 501
+    error_caching_min_ttl = 1
+  }
+
+  custom_error_response {
+    error_code            = 502
+    error_caching_min_ttl = 1
+  }
+
+  custom_error_response {
+    error_code            = 503
+    error_caching_min_ttl = 1
+  }
+
+  custom_error_response {
+    error_code            = 504
+    error_caching_min_ttl = 1
+  }
+
   default_cache_behavior {
     allowed_methods = ["HEAD", "DELETE", "POST", "GET", "OPTIONS", "PUT", "PATCH"]
     cached_methods  = ["HEAD", "GET"]
