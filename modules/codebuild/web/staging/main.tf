@@ -17,7 +17,7 @@ resource "aws_codebuild_project" "web" {
   }
 
   environment {
-    compute_type = "BUILD_GENERAL1_SMALL"
+    compute_type = "BUILD_GENERAL1_MEDIUM"
     image        = "aws/codebuild/standard:2.0"
     type         = "LINUX_CONTAINER"
 
