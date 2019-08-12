@@ -1,6 +1,7 @@
 variable "s3_bucket_artifact_store_id" {}
 variable "resource_prefix" {}
 variable "iam_role_pipeline_build_arn" {}
+variable "codebuild_name_test" {}
 variable "codebuild_name_staging" {}
 variable "codebuild_name_production" {}
 variable "codecommit_repository" {}
@@ -32,6 +33,24 @@ resource "aws_codepipeline" "service" {
       }
 
       output_artifacts = ["MyApp"]
+    }
+  }
+
+  stage {
+    name = "Test"
+
+    action {
+      category = "Test"
+      owner    = "AWS"
+      name     = "CodeBuild-Test"
+      provider = "CodeBuild"
+      version  = 1
+
+      configuration {
+        ProjectName = "${var.codebuild_name_test}"
+      }
+
+      input_artifacts = ["MyApp"]
     }
   }
 
