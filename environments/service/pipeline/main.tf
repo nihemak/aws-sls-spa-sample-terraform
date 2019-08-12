@@ -115,6 +115,7 @@ module "codepipeline_web" {
   s3_bucket_artifact_store_id = "${data.terraform_remote_state.setup.s3_bucket_artifacts_id}"
   codecommit_repository       = "${data.terraform_remote_state.setup.codecommit_web_repository}"
   iam_role_pipeline_build_arn = "${data.terraform_remote_state.setup.iam_role_pipeline_build_arn}"
+  codebuild_name_test         = "${data.terraform_remote_state.setup.codebuild_test_web_name}"
   codebuild_name_staging      = "${data.terraform_remote_state.service_web_staging.codebuild_web_name}"
   codebuild_name_production   = "${data.terraform_remote_state.service_web_production.codebuild_web_name}"
   approval_sns_topic_arn      = "${data.terraform_remote_state.setup.approval_sns_topic_arn}"
