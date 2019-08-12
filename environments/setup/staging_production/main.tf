@@ -83,6 +83,32 @@ module "codebuild_production" {
   s3_bucket_api_log_arn                  = "${module.s3_bucket_api_log_production.arn}"
 }
 
+module "iam_role_test_api" {
+  source          = "../../../modules/iam/test_api"
+  path            = "../../../modules/iam/test_api"
+  resource_prefix = "${local.resource_prefix}"
+}
+
+module "codebuild_test_api" {
+  source                = "../../../modules/codebuild/test_api"
+  resource_prefix       = "${local.resource_prefix}"
+  codecommit_repository = "${var.codecommit_api_repository}"
+  iam_role_test_api_arn = "${module.iam_role_test_api.arn}"
+}
+
+module "iam_role_test_web" {
+  source          = "../../../modules/iam/test_web"
+  path            = "../../../modules/iam/test_web"
+  resource_prefix = "${local.resource_prefix}"
+}
+
+module "codebuild_test_web" {
+  source                = "../../../modules/codebuild/test_web"
+  resource_prefix       = "${local.resource_prefix}"
+  codecommit_repository = "${var.codecommit_web_repository}"
+  iam_role_test_web_arn = "${module.iam_role_test_web.arn}"
+}
+
 module "iam_role_pipeline_build" {
   source          = "../../../modules/iam/pipeline_build"
   path            = "../../../modules/iam/pipeline_build"
@@ -146,6 +172,14 @@ output "s3_bucket_artifacts_id" {
 
 output "s3_bucket_artifacts_arn" {
   value = "${module.s3_bucket_build_artifacts.arn}"
+}
+
+output "codebuild_test_api_name" {
+  value = "${module.codebuild_test_api.name}"
+}
+
+output "codebuild_test_web_name" {
+  value = "${module.codebuild_test_web.name}"
 }
 
 output "iam_role_pipeline_build_arn" {
