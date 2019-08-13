@@ -81,6 +81,24 @@ module "codebuild_web" {
   api_base_url            = "${data.terraform_remote_state.service_base_after_api.api_base_url}"
 }
 
+module "iam_role_e2e" {
+  source          = "../../../../modules/iam/e2e"
+  path            = "../../../../modules/iam/e2e"
+  resource_prefix = "${local.resource_prefix}"
+}
+
+module "codebuild_e2e" {
+  source                = "../../../../modules/codebuild/e2e"
+  resource_prefix       = "${local.resource_prefix}"
+  codecommit_repository = "${data.terraform_remote_state.setup.codecommit_web_repository}"
+  iam_role_e2e_arn      = "${module.iam_role_e2e.arn}"
+  base_url              = "${data.terraform_remote_state.service_base_pre.web_base_url}"
+}
+
 output "codebuild_web_name" {
   value = "${module.codebuild_web.name}"
+}
+
+output "codebuild_e2e_name" {
+  value = "${module.codebuild_e2e.name}"
 }

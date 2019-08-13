@@ -3,6 +3,7 @@ variable "resource_prefix" {}
 variable "iam_role_pipeline_build_arn" {}
 variable "codebuild_name_test" {}
 variable "codebuild_name_staging" {}
+variable "codebuild_name_staging_e2e" {}
 variable "codebuild_name_production" {}
 variable "codecommit_repository" {}
 variable "approval_sns_topic_arn" {}
@@ -74,6 +75,21 @@ resource "aws_codepipeline" "service" {
     }
 
     action {
+      category = "Test"
+      owner    = "AWS"
+      name     = "CodeBuild-Staging-E2E"
+      provider = "CodeBuild"
+      version  = 1
+
+      configuration {
+        ProjectName = "${var.codebuild_name_staging_e2e}"
+      }
+
+      input_artifacts = ["MyApp"]
+      run_order       = 2
+    }
+
+    action {
       category = "Approval"
       owner    = "AWS"
       name     = "Approval"
@@ -84,7 +100,7 @@ resource "aws_codepipeline" "service" {
         NotificationArn = "${var.approval_sns_topic_arn}"
       }
 
-      run_order = 2
+      run_order = 3
     }
   }
 
