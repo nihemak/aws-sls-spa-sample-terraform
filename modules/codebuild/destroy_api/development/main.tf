@@ -23,43 +23,43 @@ resource "aws_codebuild_project" "destroy_api" {
     type         = "LINUX_CONTAINER"
 
     environment_variable {
-      "name"  = "STAGE_ENV"
-      "value" = "${var.stage}"
+      name  = "STAGE_ENV"
+      value = "${var.stage}"
     }
 
     environment_variable {
-      "name"  = "LAMBDA_ROLE"
-      "value" = "${var.iam_role_exec_api_arn}"
+      name  = "LAMBDA_ROLE"
+      value = "${var.iam_role_exec_api_arn}"
     }
 
     environment_variable {
-      "name"  = "CORS"
-      "value" = "${var.cors}"
+      name  = "CORS"
+      value = "${var.cors}"
     }
 
    environment_variable {
-      "name"  = "TZ"
-      "value" = "Asia/Tokyo"
+      name  = "TZ"
+      value = "Asia/Tokyo"
     }
 
     environment_variable {
-      "name"  = "COGNITO_POOL_ARN"
-      "value" = "${var.cognito_pool_arn}"
+      name  = "COGNITO_POOL_ARN"
+      value = "${var.cognito_pool_arn}"
     }
 
     environment_variable {
-      "name"  = "DYNAMO_PREFIX"
-      "value" = "${var.resource_prefix}"
+      name  = "DYNAMO_PREFIX"
+      value = "${var.resource_prefix}"
     }
 
     environment_variable {
-      "name"  = "DEPLOY_BUCKET"
-      "value" = "${var.s3_bucket_build_api_id}"
+      name  = "DEPLOY_BUCKET"
+      value = "${var.s3_bucket_build_api_id}"
     }
 
     environment_variable {
-      "name"  = "SERVICE_NAME"
-      "value" = "${var.service_name}"
+      name  = "SERVICE_NAME"
+      value = "${var.service_name}"
     }
   }
 

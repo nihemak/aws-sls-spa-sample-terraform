@@ -20,7 +20,7 @@ resource "aws_iam_role" "build_web" {
 data "template_file" "iam_policy_build_web" {
   template = "${file("${var.path}/policy.json")}"
 
-  vars {
+  vars = {
     aws_account_id       = "${var.aws_account_id}"
     resource_prefix      = "${var.resource_prefix}"
     s3_bucket_web_arn    = "${var.s3_bucket_web_arn}"

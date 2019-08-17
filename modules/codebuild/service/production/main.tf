@@ -22,28 +22,28 @@ resource "aws_codebuild_project" "service_production" {
     type         = "LINUX_CONTAINER"
 
     environment_variable {
-      "name"  = "TF_VAR_s3_bucket_terraform_state_id"
-      "value" = "${var.s3_bucket_terraform_state_id}"
+      name  = "TF_VAR_s3_bucket_terraform_state_id"
+      value = "${var.s3_bucket_terraform_state_id}"
     }
 
     environment_variable {
-      "name"  = "TF_VAR_resource_prefix"
-      "value" = "${var.service_resource_prefix}"
+      name  = "TF_VAR_resource_prefix"
+      value = "${var.service_resource_prefix}"
     }
 
     environment_variable {
-      "name"  = "TF_VAR_s3_bucket_audit_log_id"
-      "value" = "${var.s3_bucket_audit_log_id}"
+      name  = "TF_VAR_s3_bucket_audit_log_id"
+      value = "${var.s3_bucket_audit_log_id}"
     }
 
     environment_variable {
-      "name"  = "TF_VAR_s3_bucket_audit_log_bucket_domain_name"
-      "value" = "${var.s3_bucket_audit_log_bucket_domain_name}"
+      name  = "TF_VAR_s3_bucket_audit_log_bucket_domain_name"
+      value = "${var.s3_bucket_audit_log_bucket_domain_name}"
     }
 
     environment_variable {
-      "name"  = "TF_VAR_s3_bucket_api_log_arn"
-      "value" = "${var.s3_bucket_api_log_arn}"
+      name  = "TF_VAR_s3_bucket_api_log_arn"
+      value = "${var.s3_bucket_api_log_arn}"
     }
   }
 

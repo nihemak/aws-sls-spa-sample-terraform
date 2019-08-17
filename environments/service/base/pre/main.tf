@@ -6,10 +6,16 @@ variable "s3_bucket_audit_log_id" {}
 variable "s3_bucket_audit_log_bucket_domain_name" {}
 variable "s3_bucket_api_log_arn" {}
 
-provider "aws" {}
+provider "aws" {
+  version = ">= 2.24"
+}
+
+provider "template" {
+  version = ">= 2.1"
+}
 
 terraform {
-  required_version = ">= 0.11.0"
+  required_version = ">= 0.12.6"
 
   backend "s3" {
     region = "ap-northeast-1"
@@ -21,7 +27,7 @@ data "aws_caller_identity" "current" {}
 data "terraform_remote_state" "setup" {
   backend = "s3"
 
-  config {
+  config = {
     bucket = "${var.s3_bucket_terraform_state_id}"
     key    = "${var.tfstate_setup_key}"
     region = "ap-northeast-1"
@@ -29,7 +35,7 @@ data "terraform_remote_state" "setup" {
 }
 
 locals {
-  service_name             = "${data.terraform_remote_state.setup.service_name}"
+  service_name             = "${data.terraform_remote_state.setup.outputs.service_name}"
   resource_prefix          = "${var.resource_prefix}"
   cloudformation_api_stack = "${local.service_name}-api-${var.stage}"
 }

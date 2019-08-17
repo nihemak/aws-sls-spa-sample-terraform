@@ -21,23 +21,23 @@ resource "aws_codebuild_project" "destroy_service_development" {
     type         = "LINUX_CONTAINER"
 
     environment_variable {
-      "name"  = "TF_VAR_s3_bucket_terraform_state_id"
-      "value" = "${var.s3_bucket_terraform_state_id}"
+      name  = "TF_VAR_s3_bucket_terraform_state_id"
+      value = "${var.s3_bucket_terraform_state_id}"
     }
 
     environment_variable {
-      "name"  = "codecommit_api_branch"
-      "value" = "${var.codecommit_api_branch}"
+      name  = "codecommit_api_branch"
+      value = "${var.codecommit_api_branch}"
     }
 
     environment_variable {
-      "name"  = "codecommit_web_branch"
-      "value" = "${var.codecommit_web_branch}"
+      name  = "codecommit_web_branch"
+      value = "${var.codecommit_web_branch}"
     }
 
     environment_variable {
-      "name"  = "service_name"
-      "value" = "${var.service_name}"
+      name  = "service_name"
+      value = "${var.service_name}"
     }
   }
 

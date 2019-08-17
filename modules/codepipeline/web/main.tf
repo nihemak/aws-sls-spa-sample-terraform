@@ -27,7 +27,7 @@ resource "aws_codepipeline" "service" {
       provider = "CodeCommit"
       version  = 1
 
-      configuration {
+      configuration = {
         PollForSourceChanges = "false"
         RepositoryName       = "${var.codecommit_repository}"
         BranchName           = "master"
@@ -47,7 +47,7 @@ resource "aws_codepipeline" "service" {
       provider = "CodeBuild"
       version  = 1
 
-      configuration {
+      configuration = {
         ProjectName = "${var.codebuild_name_test}"
       }
 
@@ -65,7 +65,7 @@ resource "aws_codepipeline" "service" {
       provider = "CodeBuild"
       version  = 1
 
-      configuration {
+      configuration = {
         ProjectName = "${var.codebuild_name_staging}"
       }
 
@@ -81,7 +81,7 @@ resource "aws_codepipeline" "service" {
       provider = "CodeBuild"
       version  = 1
 
-      configuration {
+      configuration = {
         ProjectName = "${var.codebuild_name_staging_e2e}"
       }
 
@@ -96,7 +96,7 @@ resource "aws_codepipeline" "service" {
       provider = "Manual"
       version  = 1
 
-      configuration {
+      configuration = {
         NotificationArn = "${var.approval_sns_topic_arn}"
       }
 
@@ -114,7 +114,7 @@ resource "aws_codepipeline" "service" {
       provider = "CodeBuild"
       version  = 1
 
-      configuration {
+      configuration = {
         ProjectName = "${var.codebuild_name_production}"
       }
 

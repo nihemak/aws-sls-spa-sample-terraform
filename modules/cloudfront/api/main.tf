@@ -81,7 +81,7 @@ resource "aws_cloudfront_distribution" "api" {
     }
   }
 
-  tags {
+  tags = {
     billing = "${var.resource_prefix}-api-01"
   }
 

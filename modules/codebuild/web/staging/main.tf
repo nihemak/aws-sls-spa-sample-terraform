@@ -22,28 +22,28 @@ resource "aws_codebuild_project" "web" {
     type         = "LINUX_CONTAINER"
 
     environment_variable {
-      "name"  = "STAGE_ENV"
-      "value" = "${var.stage}"
+      name  = "STAGE_ENV"
+      value = "${var.stage}"
     }
 
     environment_variable {
-      "name"  = "DEPLOY_BUCKET"
-      "value" = "${var.s3_bucket_web_id}"
+      name  = "DEPLOY_BUCKET"
+      value = "${var.s3_bucket_web_id}"
     }
 
     environment_variable {
-      "name"  = "USER_POOL_ID"
-      "value" = "${var.cognito_pool_id}"
+      name  = "USER_POOL_ID"
+      value = "${var.cognito_pool_id}"
     }
 
     environment_variable {
-      "name"  = "USER_POOL_CLIENT_ID"
-      "value" = "${var.cognito_pool_client_id}"
+      name  = "USER_POOL_CLIENT_ID"
+      value = "${var.cognito_pool_client_id}"
     }
 
     environment_variable {
-      "name"  = "API_BASE_URL"
-      "value" = "${var.api_base_url}"
+      name  = "API_BASE_URL"
+      value = "${var.api_base_url}"
     }
   }
 
