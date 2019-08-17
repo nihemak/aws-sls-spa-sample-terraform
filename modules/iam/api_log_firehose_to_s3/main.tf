@@ -18,7 +18,7 @@ resource "aws_iam_role" "api_log_firehose_to_s3" {
 data "template_file" "iam_policy_api_log_firehose_to_s3" {
   template = "${file("${var.path}/policy.json")}"
 
-  vars {
+  vars = {
     s3_bucket_arn = "${var.s3_bucket_arn}"
   }
 }

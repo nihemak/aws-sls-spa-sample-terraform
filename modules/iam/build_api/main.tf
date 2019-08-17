@@ -20,7 +20,7 @@ resource "aws_iam_role" "build_api" {
 data "template_file" "iam_policy_build_api" {
   template = "${file("${var.path}/policy.json")}"
 
-  vars {
+  vars = {
     aws_account_id           = "${var.aws_account_id}"
     resource_prefix          = "${var.resource_prefix}"
     cloudformation_api_stack = "${var.cloudformation_api_stack}"

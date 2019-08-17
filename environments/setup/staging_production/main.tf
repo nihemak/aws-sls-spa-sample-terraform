@@ -7,10 +7,16 @@ variable "approval_sns_topic_arn" {}
 variable "stage_staging" {}
 variable "stage_production" {}
 
-provider "aws" {}
+provider "aws" {
+  version = ">= 2.24"
+}
+
+provider "template" {
+  version = ">= 2.1"
+}
 
 terraform {
-  required_version = ">= 0.11.0"
+  required_version = ">= 0.12.6"
 
   backend "s3" {
     region = "ap-northeast-1"

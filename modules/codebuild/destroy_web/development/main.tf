@@ -18,8 +18,8 @@ resource "aws_codebuild_project" "destroy_web" {
     type         = "LINUX_CONTAINER"
 
     environment_variable {
-      "name"  = "DEPLOY_BUCKET"
-      "value" = "${var.s3_bucket_web_id}"
+      name  = "DEPLOY_BUCKET"
+      value = "${var.s3_bucket_web_id}"
     }
   }
 

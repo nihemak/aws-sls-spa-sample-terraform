@@ -18,7 +18,7 @@ resource "aws_iam_role" "api_log_cloudwatchlogs_to_firehose" {
 data "template_file" "iam_policy_api_log_cloudwatchlogs_to_firehose" {
   template = "${file("${var.path}/policy.json")}"
 
-  vars {
+  vars = {
     aws_account_id = "${var.aws_account_id}"
     iam_role_arn   = "${aws_iam_role.api_log_cloudwatchlogs_to_firehose.arn}"
   }

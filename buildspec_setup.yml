@@ -2,7 +2,7 @@ version: 0.2
 
 env:
   variables:
-    TF_VERSION:               "0.11.14"
+    TF_VERSION:               "0.12.6"
     TF_VAR_stage_staging:     "stg"
     TF_VAR_stage_production:  "prd"
     TF_VAR_tfstate_setup_key: "setup.terraform.tfstate"

@@ -18,8 +18,8 @@ resource "aws_codebuild_project" "e2e" {
     type            = "LINUX_CONTAINER"
 
     environment_variable {
-      "name"  = "BASE_URL"
-      "value" = "${var.base_url}"
+      name  = "BASE_URL"
+      value = "${var.base_url}"
     }
   }
 

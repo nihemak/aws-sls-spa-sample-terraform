@@ -56,7 +56,7 @@ resource "aws_cloudfront_distribution" "web" {
 
   price_class = "PriceClass_200"
 
-  tags {
+  tags = {
     billing = "${var.resource_prefix}-web"
   }
 

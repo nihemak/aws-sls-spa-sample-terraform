@@ -15,7 +15,7 @@ resource "aws_iam_role" "codecommit_codepipeline_service" {
 data "template_file" "codecommit_codepipeline_service" {
   template = "${file("${var.path}/policy.json")}"
 
-  vars {
+  vars = {
     codepipeline_arn = "${var.codepipeline_arn}"    
   }
 }
