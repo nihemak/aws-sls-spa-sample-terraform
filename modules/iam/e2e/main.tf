@@ -12,9 +12,8 @@ resource "aws_iam_role" "e2e" {
   assume_role_policy = "${data.template_file.iam_assume_role_policy_e2e.rendered}"
 }
 
-resource "aws_iam_policy_attachment" "e2e" {
-  name       = "${var.resource_prefix}-codebuild-e2e-role-attachment-01"
-  roles      = ["${aws_iam_role.e2e.name}"]
+resource "aws_iam_role_policy_attachment" "e2e" {
+  role       = "${aws_iam_role.e2e.name}"
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 

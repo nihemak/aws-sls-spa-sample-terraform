@@ -12,9 +12,8 @@ resource "aws_iam_role" "test_api" {
   assume_role_policy = "${data.template_file.iam_assume_role_policy_test_api.rendered}"
 }
 
-resource "aws_iam_policy_attachment" "test_api" {
-  name       = "${var.resource_prefix}-codebuild-test-api-role-attachment-01"
-  roles      = ["${aws_iam_role.test_api.name}"]
+resource "aws_iam_role_policy_attachment" "test_api" {
+  role       = "${aws_iam_role.test_api.name}"
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 
