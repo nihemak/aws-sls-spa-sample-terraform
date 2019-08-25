@@ -1,7 +1,9 @@
 variable "resource_prefix" {}
 variable "codecommit_repository" {}
 variable "iam_role_e2e_arn" {}
-variable "base_url" {}
+variable "cognito_pool_id" {}
+variable "cognito_pool_client_id" {}
+variable "api_base_url" {}
 
 resource "aws_codebuild_project" "e2e" {
   name = "${var.resource_prefix}-e2e-codebuild-01"
@@ -18,8 +20,18 @@ resource "aws_codebuild_project" "e2e" {
     type            = "LINUX_CONTAINER"
 
     environment_variable {
-      name  = "BASE_URL"
-      value = "${var.base_url}"
+      name  = "USER_POOL_ID"
+      value = "${var.cognito_pool_id}"
+    }
+
+    environment_variable {
+      name  = "USER_POOL_CLIENT_ID"
+      value = "${var.cognito_pool_client_id}"
+    }
+
+    environment_variable {
+      name  = "API_BASE_URL"
+      value = "${var.api_base_url}"
     }
   }
 

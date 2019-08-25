@@ -59,6 +59,21 @@ resource "aws_codepipeline" "service" {
     name = "Build-Staging"
 
     action {
+      category = "Test"
+      owner    = "AWS"
+      name     = "CodeBuild-Staging-E2E"
+      provider = "CodeBuild"
+      version  = 1
+
+      configuration = {
+        ProjectName = "${var.codebuild_name_staging_e2e}"
+      }
+
+      input_artifacts = ["MyApp"]
+      run_order       = 1
+    }
+
+    action {
       category = "Build"
       owner    = "AWS"
       name     = "CodeBuild-Staging"
@@ -71,22 +86,7 @@ resource "aws_codepipeline" "service" {
 
       input_artifacts  = ["MyApp"]
       output_artifacts = ["MyAppBuild"]
-      run_order        = 1
-    }
-
-    action {
-      category = "Test"
-      owner    = "AWS"
-      name     = "CodeBuild-Staging-E2E"
-      provider = "CodeBuild"
-      version  = 1
-
-      configuration = {
-        ProjectName = "${var.codebuild_name_staging_e2e}"
-      }
-
-      input_artifacts = ["MyApp"]
-      run_order       = 2
+      run_order        = 2
     }
 
     action {

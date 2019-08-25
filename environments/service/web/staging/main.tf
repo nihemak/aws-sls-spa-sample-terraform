@@ -94,11 +94,13 @@ module "iam_role_e2e" {
 }
 
 module "codebuild_e2e" {
-  source                = "../../../../modules/codebuild/e2e"
-  resource_prefix       = "${local.resource_prefix}"
-  codecommit_repository = "${data.terraform_remote_state.setup.outputs.codecommit_web_repository}"
-  iam_role_e2e_arn      = "${module.iam_role_e2e.arn}"
-  base_url              = "${data.terraform_remote_state.service_base_pre.outputs.web_base_url}"
+  source                 = "../../../../modules/codebuild/e2e"
+  resource_prefix        = "${local.resource_prefix}"
+  codecommit_repository  = "${data.terraform_remote_state.setup.outputs.codecommit_web_repository}"
+  iam_role_e2e_arn       = "${module.iam_role_e2e.arn}"
+  cognito_pool_id        = "${data.terraform_remote_state.service_base_pre.outputs.cognito_pool_api_id}"
+  cognito_pool_client_id = "${data.terraform_remote_state.service_base_pre.outputs.cognito_pool_api_client_web_id}"
+  api_base_url           = "${data.terraform_remote_state.service_base_after_api.outputs.api_base_url}"
 }
 
 output "codebuild_web_name" {
