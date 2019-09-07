@@ -8,8 +8,10 @@ cd environments/setup/development/ || exit 99
 
 terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id:?}" \
                -backend-config="key=${TF_VAR_tfstate_setup_key:?}"
-terraform plan -var "codecommit_api_branch=${codecommit_api_branch:?}" \
-               -var "codecommit_web_branch=${codecommit_web_branch:?}"
+terraform validate -var "codecommit_api_branch=${codecommit_api_branch:?}" \
+                   -var "codecommit_web_branch=${codecommit_web_branch:?}"
+terraform plan -var "codecommit_api_branch=${codecommit_api_branch}" \
+               -var "codecommit_web_branch=${codecommit_web_branch}"
 terraform apply -auto-approve \
                 -var "codecommit_api_branch=${codecommit_api_branch}" \
                 -var "codecommit_web_branch=${codecommit_web_branch}"
@@ -34,6 +36,10 @@ cd environments/service/base/pre/ || exit 99
 terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" \
                -backend-config="key=${TF_VAR_tfstate_service_base_pre_key:?}"
 resource_prefix="${TF_VAR_service_name:?}-${TF_VAR_stage:?}"
+terraform validate -var "resource_prefix=${resource_prefix}" \
+                   -var "s3_bucket_audit_log_id=${s3_bucket_audit_log_id}" \
+                   -var "s3_bucket_audit_log_bucket_domain_name=${s3_bucket_audit_log_bucket_domain_name}" \
+                   -var "s3_bucket_api_log_arn=${s3_bucket_api_log_arn}"
 terraform plan -var "resource_prefix=${resource_prefix}" \
                -var "s3_bucket_audit_log_id=${s3_bucket_audit_log_id}" \
                -var "s3_bucket_audit_log_bucket_domain_name=${s3_bucket_audit_log_bucket_domain_name}" \
@@ -65,6 +71,7 @@ cd environments/service/api/development/ || exit 99
 
 terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" \
                -backend-config="key=${TF_VAR_tfstate_service_api_key:?}"
+terraform validate
 terraform plan
 terraform apply -auto-approve
 
@@ -93,6 +100,7 @@ cd environments/service/base/after_api/ || exit 99
 
 terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" \
                -backend-config="key=${TF_VAR_tfstate_service_base_after_api_key:?}"
+terraform validate
 terraform plan
 terraform apply -auto-approve
 
@@ -106,6 +114,7 @@ cd environments/service/web/development/ || exit 99
 
 terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" \
                -backend-config="key=${TF_VAR_tfstate_service_web_key:?}"
+terraform validate
 terraform plan
 terraform apply -auto-approve
 
