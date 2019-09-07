@@ -8,6 +8,7 @@ cd environments/service/base/pre/ || exit 99
 
 terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id:?}" \
                -backend-config="key=${TF_VAR_tfstate_service_base_pre_key:?}"
+terraform validate
 terraform plan
 terraform apply -auto-approve
 
@@ -32,6 +33,7 @@ cd environments/service/api/staging/ || exit 99
 
 terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" \
                -backend-config="key=${TF_VAR_tfstate_service_api_key:?}"
+terraform validate
 terraform plan
 terraform apply -auto-approve
 
@@ -61,6 +63,7 @@ cd environments/service/base/after_api/ || exit 99
 
 terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" \
                -backend-config="key=${TF_VAR_tfstate_service_base_after_api_key:?}"
+terraform validate
 terraform plan
 terraform apply -auto-approve
 
@@ -74,6 +77,7 @@ cd environments/service/web/staging/ || exit 99
 
 terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" \
                -backend-config="key=${TF_VAR_tfstate_service_web_key:?}"
+terraform validate
 terraform plan
 terraform apply -auto-approve
 
