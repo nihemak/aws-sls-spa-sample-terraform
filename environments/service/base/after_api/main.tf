@@ -19,6 +19,8 @@ terraform {
   }
 }
 
+data "aws_caller_identity" "current" {}
+
 data "terraform_remote_state" "service_base_pre" {
   backend = "s3"
 
@@ -30,7 +32,48 @@ data "terraform_remote_state" "service_base_pre" {
 }
 
 locals {
-  resource_prefix = "${data.terraform_remote_state.service_base_pre.outputs.resource_prefix}"
+  resource_prefix          = "${data.terraform_remote_state.service_base_pre.outputs.resource_prefix}"
+  cloudformation_api_stack = "${data.terraform_remote_state.service_base_pre.outputs.cloudformation_api_stack}"
+  s3_bucket_audit_log_id   = "${data.terraform_remote_state.service_base_pre.outputs.s3_bucket_audit_log_id}"
+}
+
+module "s3_bucket_apigw_log" {
+  source            = "../../../../modules/s3/bucket/apigw_log"
+  resource_prefix   = "${local.resource_prefix}"
+  logging_bucket_id = "${local.s3_bucket_audit_log_id}"
+}
+
+module "iam_role_apigw_firehose_to_s3" {
+  source          = "../../../../modules/iam/apigw_firehose_to_s3"
+  path            = "../../../../modules/iam/apigw_firehose_to_s3"
+  resource_prefix = "${local.resource_prefix}"
+  s3_bucket_arn   = "${module.s3_bucket_apigw_log.arn}"
+}
+
+resource "aws_kinesis_firehose_delivery_stream" "apigw" {
+  name        = "${local.resource_prefix}-apigw-cwl-to-s3-stream"
+  destination = "s3"
+
+  s3_configuration {
+    role_arn           = "${module.iam_role_apigw_firehose_to_s3.arn}"
+    bucket_arn         = "${module.s3_bucket_apigw_log.arn}"
+    compression_format = "GZIP"
+  }
+}
+
+module "iam_role_apigw_cloudwatchlogs_to_s3_policy" {
+  source          = "../../../../modules/iam/apigw_coudwatchlogs_to_s3_policy"
+  path            = "../../../../modules/iam/apigw_coudwatchlogs_to_s3_policy"
+  aws_account_id  = "${data.aws_caller_identity.current.account_id}"
+  resource_prefix = "${local.resource_prefix}"
+}
+
+resource "aws_cloudwatch_log_subscription_filter" "apigw_logfilter" {
+  name            = "${local.resource_prefix}-apigw_logfilter"
+  role_arn        = "${module.iam_role_apigw_cloudwatchlogs_to_s3_policy.arn}"
+  log_group_name  = "/aws/api-gateway/${local.cloudformation_api_stack}"
+  filter_pattern  = ""
+  destination_arn = "${aws_kinesis_firehose_delivery_stream.apigw.arn}"
 }
 
 module "cloudfront_api" {
