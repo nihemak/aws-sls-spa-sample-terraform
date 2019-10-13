@@ -38,6 +38,42 @@ locals {
   service_name             = "${data.terraform_remote_state.setup.outputs.service_name}"
   resource_prefix          = "${var.resource_prefix}"
   cloudformation_api_stack = "${local.service_name}-api-${var.stage}"
+  cloudformation_tool_stack = "${local.service_name}-tool-${var.stage}"
+}
+
+## tool
+
+module "iam_role_build_tool" {
+  source                    = "../../../../modules/iam/build_tool"
+  path                      = "../../../../modules/iam/build_tool"
+  aws_account_id            = "${data.aws_caller_identity.current.account_id}"
+  resource_prefix           = "${local.resource_prefix}"
+  cloudformation_tool_stack = "${local.cloudformation_tool_stack}"
+}
+
+module "s3_bucket_build_tool" {
+  source            = "../../../../modules/s3/bucket/build_tool"
+  resource_prefix   = "${local.resource_prefix}"
+  logging_bucket_id = "${var.s3_bucket_audit_log_id}"
+}
+
+module "iam_role_exec_tool" {
+  source                    = "../../../../modules/iam/exec_tool"
+  path                      = "../../../../modules/iam/exec_tool"
+  aws_account_id            = "${data.aws_caller_identity.current.account_id}"
+  resource_prefix           = "${local.resource_prefix}"
+  cloudformation_tool_stack = "${local.cloudformation_tool_stack}"
+}
+
+module "codebuild_tool" {
+  source                  = "../../../../modules/codebuild/tool"
+  codecommit_repository   = "${data.terraform_remote_state.setup.outputs.codecommit_infra_repository}"
+  iam_role_build_tool_arn = "${module.iam_role_build_tool.arn}"
+  s3_bucket_build_tool_id = "${module.s3_bucket_build_tool.id}"
+  resource_prefix         = "${var.resource_prefix}"
+  stage                   = "${var.stage}"
+  iam_role_exec_tool_arn  = "${module.iam_role_exec_tool.arn}"
+  service_name            = "${local.service_name}"
 }
 
 ## dynamo db
@@ -119,6 +155,10 @@ output "resource_prefix" {
   value = "${local.resource_prefix}"
 }
 
+output "cloudformation_tool_stack" {
+  value = "${local.cloudformation_tool_stack}"
+}
+
 output "cloudformation_api_stack" {
   value = "${local.cloudformation_api_stack}"
 }
@@ -173,4 +213,8 @@ output "cloudfront_web_origin_access_identity" {
 
 output "web_base_url" {
   value = "https://${module.cloudfront_web.domain_name}"
+}
+
+output "codebuild_tool_name" {
+  value = "${module.codebuild_tool.name}"
 }

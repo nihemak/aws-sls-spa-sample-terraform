@@ -1,0 +1,15 @@
+service:
+  name: ${env:SERVICE_NAME}-tool
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  region: ap-northeast-1
+  stage: ${env:STAGE_ENV}
+  role: ${env:LAMBDA_ROLE}
+  deploymentBucket:
+    name: ${env:DEPLOY_BUCKET}
+
+functions:
+  logsProcessor:
+    handler: index.handler

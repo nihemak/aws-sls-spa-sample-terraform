@@ -1,0 +1,19 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 8
+    commands:
+      - cd serverless
+      - npm install -g serverless@1.49.0
+      - COMMIT="ec522aa8c09df0eafbfe286cd1275ca5eb418e98"
+      - curl -s -qL -o index.js "https://raw.githubusercontent.com/tmakota/amazon-kinesis-firehose-cloudwatch-logs-processor/${COMMIT}/index.js"
+  build:
+    commands:
+      - serverless deploy
+  post_build:
+    commands:
+      - zip -rq tool.zip *
+artifacts:
+  files:
+    - tool.zip

@@ -23,7 +23,11 @@ iam_role_api_log_cloudwatchlogs_to_s3_policy_arn=$( \
 )
 echo "iam_role_api_log_cloudwatchlogs_to_s3_policy_arn: ${iam_role_api_log_cloudwatchlogs_to_s3_policy_arn}"
 
+codebuild_name=$(terraform output codebuild_tool_name)
+
 cd - || exit 99
+
+./bin/exec_codebuild.sh "${codebuild_name}" master
 
 ##
 echo "START: api..."

@@ -35,6 +35,7 @@ locals {
   resource_prefix          = "${data.terraform_remote_state.service_base_pre.outputs.resource_prefix}"
   cloudformation_api_stack = "${data.terraform_remote_state.service_base_pre.outputs.cloudformation_api_stack}"
   s3_bucket_audit_log_id   = "${data.terraform_remote_state.service_base_pre.outputs.s3_bucket_audit_log_id}"
+  cloudformation_tool_stack = "${data.terraform_remote_state.service_base_pre.outputs.cloudformation_tool_stack}"
 }
 
 module "s3_bucket_apigw_log" {
@@ -48,16 +49,31 @@ module "iam_role_apigw_firehose_to_s3" {
   path            = "../../../../modules/iam/apigw_firehose_to_s3"
   resource_prefix = "${local.resource_prefix}"
   s3_bucket_arn   = "${module.s3_bucket_apigw_log.arn}"
+  aws_account_id            = "${data.aws_caller_identity.current.account_id}"
+  cloudformation_tool_stack = "${local.cloudformation_tool_stack}"
 }
 
 resource "aws_kinesis_firehose_delivery_stream" "apigw" {
   name        = "${local.resource_prefix}-apigw-cwl-to-s3-stream"
-  destination = "s3"
+  destination = "extended_s3"
 
-  s3_configuration {
+  extended_s3_configuration {
     role_arn           = "${module.iam_role_apigw_firehose_to_s3.arn}"
     bucket_arn         = "${module.s3_bucket_apigw_log.arn}"
     compression_format = "GZIP"
+
+    processing_configuration {
+      enabled = "true"
+
+      processors {
+        type = "Lambda"
+
+        parameters {
+          parameter_name  = "LambdaArn"
+          parameter_value = "arn:aws:lambda:ap-northeast-1:${data.aws_caller_identity.current.account_id}:function:${local.cloudformation_tool_stack}-logsProcessor:$LATEST"
+        }
+      }
+    }
   }
 }
 
