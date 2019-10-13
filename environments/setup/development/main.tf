@@ -69,6 +69,10 @@ output "service_name" {
   value = "${var.service_name}"
 }
 
+output "codecommit_infra_repository" {
+  value = "${var.codecommit_infra_repository}"
+}
+
 output "codecommit_api_repository" {
   value = "${var.codecommit_api_repository}"
 }

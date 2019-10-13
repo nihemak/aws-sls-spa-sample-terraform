@@ -1,6 +1,8 @@
 variable "path" {}
 variable "resource_prefix" {}
+variable "aws_account_id" {}
 variable "s3_bucket_arn" {}
+variable "cloudformation_tool_stack" {}
 
 ## role
 
@@ -19,7 +21,9 @@ data "template_file" "iam_policy_apigw_firehose_to_s3" {
   template = "${file("${var.path}/policy.json")}"
 
   vars = {
-    s3_bucket_arn = "${var.s3_bucket_arn}"
+    s3_bucket_arn             = "${var.s3_bucket_arn}"
+    aws_account_id            = "${var.aws_account_id}"
+    cloudformation_tool_stack = "${var.cloudformation_tool_stack}"
   }
 }
 

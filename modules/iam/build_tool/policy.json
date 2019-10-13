@@ -1,0 +1,121 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:s3:::${resource_prefix}-*"
+            ],
+            "Action": [
+                "s3:*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:logs:ap-northeast-1:${aws_account_id}:log-group:*"
+            ],
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:deleteLogGroup",
+                "logs:deleteLogStream",
+                "logs:PutLogEvents",
+                "logs:DescribeLogStreams",
+                "logs:DescribeLogGroups",
+                "logs:FilterLogEvents",
+                "logs:PutRetentionPolicy"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:codecommit:ap-northeast-1:${aws_account_id}:*"
+            ],
+            "Action": [
+                "codecommit:*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "lambda:Get*",
+                "lambda:List*",
+                "lambda:Update*",
+                "lambda:CreateFunction",
+                "lambda:DeleteFunction",
+                "lambda:InvokeFunction",
+                "lambda:PublishVersion",
+                "lambda:CreateAlias",
+                "lambda:DeleteAlias",
+                "lambda:AddPermission",
+                "lambda:RemovePermission"
+            ],
+            "Resource": [
+                "arn:aws:lambda:ap-northeast-1:${aws_account_id}:function:${cloudformation_tool_stack}-*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "lambda:TagResource",
+                "lambda:ListTags",
+                "lambda:UntagResource",
+                "lambda:GetEventSourceMapping",
+                "lambda:ListEventSourceMappings"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "lambda:CreateEventSourceMapping",
+                "lambda:DeleteEventSourceMapping",
+                "lambda:UpdateEventSourceMapping"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "StringLike": {
+                    "lambda:FunctionArn": "arn:aws:lambda:ap-northeast-1:${aws_account_id}:function:${cloudformation_tool_stack}-*"
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "cloudformation:*"
+            ],
+            "Resource": [
+                "arn:aws:cloudformation:ap-northeast-1:${aws_account_id}:stack/${cloudformation_tool_stack}",
+                "arn:aws:cloudformation:ap-northeast-1:${aws_account_id}:stack/${cloudformation_tool_stack}/*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "cloudformation:ValidateTemplate"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "iam:PassRole"
+            ],
+            "Resource": [
+                "arn:aws:iam::${aws_account_id}:role/${resource_prefix}-*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ssm:GetParameters"
+            ],
+            "Resource": [
+                "*"
+            ]
+        }
+    ]
+}

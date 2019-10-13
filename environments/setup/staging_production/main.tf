@@ -164,6 +164,10 @@ output "resource_prefix" {
   value = "${local.resource_prefix}"
 }
 
+output "codecommit_infra_repository" {
+  value = "${var.codecommit_infra_repository}"
+}
+
 output "codecommit_api_repository" {
   value = "${var.codecommit_api_repository}"
 }
