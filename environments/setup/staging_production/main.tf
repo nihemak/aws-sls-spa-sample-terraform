@@ -52,18 +52,6 @@ module "s3_bucket_audit_log_production" {
   resource_prefix = "${local.resource_prefix_production}"
 }
 
-module "s3_bucket_api_log_staging" {
-  source            = "../../../modules/s3/bucket/api_log"
-  resource_prefix   = "${local.resource_prefix_staging}"
-  logging_bucket_id = "${module.s3_bucket_audit_log_staging.id}"
-}
-
-module "s3_bucket_api_log_production" {
-  source            = "../../../modules/s3/bucket/api_log"
-  resource_prefix   = "${local.resource_prefix_production}"
-  logging_bucket_id = "${module.s3_bucket_audit_log_production.id}"
-}
-
 module "codebuild_staging" {
   source                                 = "../../../modules/codebuild/service/staging"
   codecommit_repository                  = "${var.codecommit_infra_repository}"
@@ -74,7 +62,6 @@ module "codebuild_staging" {
   service_resource_prefix                = "${local.resource_prefix_staging}"
   s3_bucket_audit_log_id                 = "${module.s3_bucket_audit_log_staging.id}"
   s3_bucket_audit_log_bucket_domain_name = "${module.s3_bucket_audit_log_staging.bucket_domain_name}"
-  s3_bucket_api_log_arn                  = "${module.s3_bucket_api_log_staging.arn}"
 }
 
 module "codebuild_production" {
@@ -86,7 +73,6 @@ module "codebuild_production" {
   service_resource_prefix                = "${local.resource_prefix_production}"
   s3_bucket_audit_log_id                 = "${module.s3_bucket_audit_log_production.id}"
   s3_bucket_audit_log_bucket_domain_name = "${module.s3_bucket_audit_log_production.bucket_domain_name}"
-  s3_bucket_api_log_arn                  = "${module.s3_bucket_api_log_production.arn}"
 }
 
 module "iam_role_test_api" {
