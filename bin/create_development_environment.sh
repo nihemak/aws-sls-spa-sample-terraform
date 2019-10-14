@@ -22,9 +22,6 @@ echo "s3_bucket_audit_log_id: ${s3_bucket_audit_log_id}"
 s3_bucket_audit_log_bucket_domain_name=$(terraform output s3_bucket_audit_log_bucket_domain_name)
 echo "s3_bucket_audit_log_bucket_domain_name: ${s3_bucket_audit_log_bucket_domain_name}"
 
-s3_bucket_api_log_arn=$(terraform output s3_bucket_api_log_arn)
-echo "s3_bucket_api_log_arn: ${s3_bucket_api_log_arn}"
-
 cd - || exit 99
 
 ##
@@ -38,17 +35,14 @@ terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" \
 resource_prefix="${TF_VAR_service_name:?}-${TF_VAR_stage:?}"
 terraform validate -var "resource_prefix=${resource_prefix}" \
                    -var "s3_bucket_audit_log_id=${s3_bucket_audit_log_id}" \
-                   -var "s3_bucket_audit_log_bucket_domain_name=${s3_bucket_audit_log_bucket_domain_name}" \
-                   -var "s3_bucket_api_log_arn=${s3_bucket_api_log_arn}"
+                   -var "s3_bucket_audit_log_bucket_domain_name=${s3_bucket_audit_log_bucket_domain_name}"
 terraform plan -var "resource_prefix=${resource_prefix}" \
                -var "s3_bucket_audit_log_id=${s3_bucket_audit_log_id}" \
-               -var "s3_bucket_audit_log_bucket_domain_name=${s3_bucket_audit_log_bucket_domain_name}" \
-               -var "s3_bucket_api_log_arn=${s3_bucket_api_log_arn}"
+               -var "s3_bucket_audit_log_bucket_domain_name=${s3_bucket_audit_log_bucket_domain_name}"
 terraform apply -auto-approve \
                 -var "resource_prefix=${resource_prefix}" \
                 -var "s3_bucket_audit_log_id=${s3_bucket_audit_log_id}" \
-                -var "s3_bucket_audit_log_bucket_domain_name=${s3_bucket_audit_log_bucket_domain_name}" \
-                -var "s3_bucket_api_log_arn=${s3_bucket_api_log_arn}"
+                -var "s3_bucket_audit_log_bucket_domain_name=${s3_bucket_audit_log_bucket_domain_name}"
 
 cloudformation_api_stack=$(terraform output cloudformation_api_stack)
 echo "cloudformation_api_stack: ${cloudformation_api_stack}"
