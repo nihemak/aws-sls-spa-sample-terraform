@@ -9,6 +9,12 @@ provider "aws" {
   version = ">= 2.24"
 }
 
+provider "aws" {
+  alias   = "useast1"
+  version = ">= 2.24"
+  region  = "us-east-1"
+}
+
 provider "template" {
   version = ">= 2.1"
 }
@@ -91,10 +97,38 @@ module "cognito_pool_api" {
 
 ## waf
 
+module "s3_bucket_waf_log" {
+  source            = "../../../../modules/s3/bucket/waf_log"
+  resource_prefix   = "${local.resource_prefix}"
+  logging_bucket_id = "${var.s3_bucket_audit_log_id}"
+}
+
+module "iam_role_waf_log_firehose_to_s3" {
+  source          = "../../../../modules/iam/waf_log_firehose_to_s3"
+  path            = "../../../../modules/iam/waf_log_firehose_to_s3"
+  resource_prefix = "${local.resource_prefix}"
+  s3_bucket_arn   = "${module.s3_bucket_waf_log.arn}"
+}
+
+resource "aws_kinesis_firehose_delivery_stream" "waf_log" {
+  provider    = aws.useast1
+  name        = "aws-waf-logs-${local.resource_prefix}"
+  destination = "s3"
+
+  s3_configuration {
+    role_arn           = "${module.iam_role_waf_log_firehose_to_s3.arn}"
+    bucket_arn         = "${module.s3_bucket_waf_log.arn}"
+    compression_format = "GZIP"
+  }
+}
+
 module "waf_acl" {
   source          = "../../../../modules/waf"
   resource_prefix = "${local.resource_prefix}"
+  firehose_arn    = "${aws_kinesis_firehose_delivery_stream.waf_log.arn}"
 }
+
+## api
 
 module "s3_bucket_api_log" {
   source            = "../../../../modules/s3/bucket/api_log"
@@ -126,8 +160,6 @@ module "iam_role_api_log_cloudwatchlogs_to_s3_policy" {
   aws_account_id  = "${data.aws_caller_identity.current.account_id}"
   resource_prefix = "${local.resource_prefix}"
 }
-
-## api
 
 module "iam_role_exec_api" {
   source                   = "../../../../modules/iam/exec_api"

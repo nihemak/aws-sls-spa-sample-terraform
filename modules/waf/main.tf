@@ -1,4 +1,5 @@
 variable "resource_prefix" {}
+variable "firehose_arn" {}
 
 ## conditions
 
@@ -174,6 +175,10 @@ resource "aws_waf_web_acl" "common" {
 
     priority = 3
     rule_id  = "${aws_waf_rule.common_xss_match.id}"
+  }
+
+  logging_configuration {
+    log_destination = "${var.firehose_arn}"
   }
 }
 
