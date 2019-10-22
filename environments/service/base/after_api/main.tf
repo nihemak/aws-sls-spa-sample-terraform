@@ -98,7 +98,7 @@ module "cloudfront_api" {
   stage                            = "${var.stage}"
   apigw_api_domain_name            = "${var.apigw_api_id}.execute-api.ap-northeast-1.amazonaws.com"
   s3_bucket_audit_log_domain_name  = "${data.terraform_remote_state.service_base_pre.outputs.s3_bucket_audit_log_domain_name}"
-  waf_acl_id                       = "${data.terraform_remote_state.service_base_pre.outputs.waf_acl_id}"
+  waf_acl_id                       = "${data.terraform_remote_state.service_base_pre.outputs.waf_acl_api_id}"
 }
 
 output "api_base_url" {

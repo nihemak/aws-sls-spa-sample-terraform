@@ -95,37 +95,83 @@ module "cognito_pool_api" {
   resource_prefix   = "${local.resource_prefix}"
 }
 
-## waf
+## waf common
 
-module "s3_bucket_waf_log" {
-  source            = "../../../../modules/s3/bucket/waf_log"
+module "waf_rule" {
+  source          = "../../../../modules/waf/rule"
+  resource_prefix = "${local.resource_prefix}"
+}
+
+## waf api
+
+module "s3_bucket_waf_log_api" {
+  source            = "../../../../modules/s3/bucket/waf_log_api"
   resource_prefix   = "${local.resource_prefix}"
   logging_bucket_id = "${var.s3_bucket_audit_log_id}"
 }
 
-module "iam_role_waf_log_firehose_to_s3" {
-  source          = "../../../../modules/iam/waf_log_firehose_to_s3"
-  path            = "../../../../modules/iam/waf_log_firehose_to_s3"
+module "iam_role_waf_log_api_firehose_to_s3" {
+  source          = "../../../../modules/iam/waf_log_api_firehose_to_s3"
+  path            = "../../../../modules/iam/waf_log_api_firehose_to_s3"
   resource_prefix = "${local.resource_prefix}"
-  s3_bucket_arn   = "${module.s3_bucket_waf_log.arn}"
+  s3_bucket_arn   = "${module.s3_bucket_waf_log_api.arn}"
 }
 
-resource "aws_kinesis_firehose_delivery_stream" "waf_log" {
+resource "aws_kinesis_firehose_delivery_stream" "waf_log_api" {
   provider    = aws.useast1
-  name        = "aws-waf-logs-${local.resource_prefix}"
+  name        = "aws-waf-logs-${local.resource_prefix}-api"
   destination = "s3"
 
   s3_configuration {
-    role_arn           = "${module.iam_role_waf_log_firehose_to_s3.arn}"
-    bucket_arn         = "${module.s3_bucket_waf_log.arn}"
+    role_arn           = "${module.iam_role_waf_log_api_firehose_to_s3.arn}"
+    bucket_arn         = "${module.s3_bucket_waf_log_api.arn}"
     compression_format = "GZIP"
   }
 }
 
-module "waf_acl" {
-  source          = "../../../../modules/waf"
+module "waf_acl_api" {
+  source                      = "../../../../modules/waf/api"
+  resource_prefix             = "${local.resource_prefix}"
+  firehose_arn                = "${aws_kinesis_firehose_delivery_stream.waf_log_api.arn}"
+  rule_size_constraint_id     = "${module.waf_rule.rule_size_constraint_id}"
+  rule_sql_injection_match_id = "${module.waf_rule.rule_sql_injection_match_id}"
+  rule_xss_match_id           = "${module.waf_rule.rule_xss_match_id}"
+}
+
+## waf web
+
+module "s3_bucket_waf_log_web" {
+  source            = "../../../../modules/s3/bucket/waf_log_web"
+  resource_prefix   = "${local.resource_prefix}"
+  logging_bucket_id = "${var.s3_bucket_audit_log_id}"
+}
+
+module "iam_role_waf_log_web_firehose_to_s3" {
+  source          = "../../../../modules/iam/waf_log_web_firehose_to_s3"
+  path            = "../../../../modules/iam/waf_log_web_firehose_to_s3"
   resource_prefix = "${local.resource_prefix}"
-  firehose_arn    = "${aws_kinesis_firehose_delivery_stream.waf_log.arn}"
+  s3_bucket_arn   = "${module.s3_bucket_waf_log_web.arn}"
+}
+
+resource "aws_kinesis_firehose_delivery_stream" "waf_log_web" {
+  provider    = aws.useast1
+  name        = "aws-waf-logs-${local.resource_prefix}-web"
+  destination = "s3"
+
+  s3_configuration {
+    role_arn           = "${module.iam_role_waf_log_web_firehose_to_s3.arn}"
+    bucket_arn         = "${module.s3_bucket_waf_log_web.arn}"
+    compression_format = "GZIP"
+  }
+}
+
+module "waf_acl_web" {
+  source                      = "../../../../modules/waf/web"
+  resource_prefix             = "${local.resource_prefix}"
+  firehose_arn                = "${aws_kinesis_firehose_delivery_stream.waf_log_web.arn}"
+  rule_size_constraint_id     = "${module.waf_rule.rule_size_constraint_id}"
+  rule_sql_injection_match_id = "${module.waf_rule.rule_sql_injection_match_id}"
+  rule_xss_match_id           = "${module.waf_rule.rule_xss_match_id}"
 }
 
 ## api
@@ -183,7 +229,7 @@ module "cloudfront_web" {
   s3_bucket_audit_log_domain_name = "${var.s3_bucket_audit_log_bucket_domain_name}"
   s3_bucket_web_id                = "${module.s3_bucket_web.id}"
   s3_bucket_web_domain_name       = "${module.s3_bucket_web.domain_name}"
-  waf_acl_id                      = "${module.waf_acl.id}"
+  waf_acl_id                      = "${module.waf_acl_web.id}"
 }
 
 ## outputs
@@ -220,8 +266,8 @@ output "cognito_pool_api_client_web_id" {
   value = "${module.cognito_pool_api.client_web_id}"
 }
 
-output "waf_acl_id" {
-  value = "${module.waf_acl.id}"
+output "waf_acl_api_id" {
+  value = "${module.waf_acl_api.id}"
 }
 
 output "iam_role_exec_api_arn" {
