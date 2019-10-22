@@ -90,7 +90,3 @@ output "codebuild_destroy_name" {
 output "s3_bucket_audit_log_id" {
   value = "${module.s3_bucket_audit_log.id}"
 }
-
-output "s3_bucket_audit_log_bucket_domain_name" {
-  value = "${module.s3_bucket_audit_log.bucket_domain_name}"
-}

@@ -53,26 +53,24 @@ module "s3_bucket_audit_log_production" {
 }
 
 module "codebuild_staging" {
-  source                                 = "../../../modules/codebuild/service/staging"
-  codecommit_repository                  = "${var.codecommit_infra_repository}"
-  s3_bucket_source_id                    = "${module.s3_bucket_build_artifacts.id}"
-  resource_prefix                        = "${local.resource_prefix}"
-  iam_role_build_arn                     = "${module.iam_role_build_service.arn}"
-  s3_bucket_terraform_state_id           = "${var.s3_bucket_terraform_state_id}"
-  service_resource_prefix                = "${local.resource_prefix_staging}"
-  s3_bucket_audit_log_id                 = "${module.s3_bucket_audit_log_staging.id}"
-  s3_bucket_audit_log_bucket_domain_name = "${module.s3_bucket_audit_log_staging.bucket_domain_name}"
+  source                       = "../../../modules/codebuild/service/staging"
+  codecommit_repository        = "${var.codecommit_infra_repository}"
+  s3_bucket_source_id          = "${module.s3_bucket_build_artifacts.id}"
+  resource_prefix              = "${local.resource_prefix}"
+  iam_role_build_arn           = "${module.iam_role_build_service.arn}"
+  s3_bucket_terraform_state_id = "${var.s3_bucket_terraform_state_id}"
+  service_resource_prefix      = "${local.resource_prefix_staging}"
+  s3_bucket_audit_log_id       = "${module.s3_bucket_audit_log_staging.id}"
 }
 
 module "codebuild_production" {
-  source                                 = "../../../modules/codebuild/service/production"
-  s3_bucket_source_arn                   = "${module.s3_bucket_build_artifacts.arn}"
-  resource_prefix                        = "${local.resource_prefix}"
-  iam_role_build_arn                     = "${module.iam_role_build_service.arn}"
-  s3_bucket_terraform_state_id           = "${var.s3_bucket_terraform_state_id}"
-  service_resource_prefix                = "${local.resource_prefix_production}"
-  s3_bucket_audit_log_id                 = "${module.s3_bucket_audit_log_production.id}"
-  s3_bucket_audit_log_bucket_domain_name = "${module.s3_bucket_audit_log_production.bucket_domain_name}"
+  source                       = "../../../modules/codebuild/service/production"
+  s3_bucket_source_arn         = "${module.s3_bucket_build_artifacts.arn}"
+  resource_prefix              = "${local.resource_prefix}"
+  iam_role_build_arn           = "${module.iam_role_build_service.arn}"
+  s3_bucket_terraform_state_id = "${var.s3_bucket_terraform_state_id}"
+  service_resource_prefix      = "${local.resource_prefix_production}"
+  s3_bucket_audit_log_id       = "${module.s3_bucket_audit_log_production.id}"
 }
 
 module "iam_role_test_api" {

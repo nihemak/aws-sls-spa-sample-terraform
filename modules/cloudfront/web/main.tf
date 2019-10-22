@@ -1,5 +1,5 @@
 variable "resource_prefix" {}
-variable "s3_bucket_audit_log_domain_name" {}
+variable "s3_bucket_log_domain_name" {}
 variable "s3_bucket_web_id" {}
 variable "s3_bucket_web_domain_name" {}
 variable "waf_acl_id" {}
@@ -24,8 +24,7 @@ resource "aws_cloudfront_distribution" "web" {
 
   logging_config {
     include_cookies = false
-    bucket          = "${var.s3_bucket_audit_log_domain_name}"
-    prefix          = "${var.resource_prefix}-web"
+    bucket          = "${var.s3_bucket_log_domain_name}"
   }
 
   default_cache_behavior {

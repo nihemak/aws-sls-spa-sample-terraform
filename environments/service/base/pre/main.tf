@@ -3,7 +3,6 @@ variable "s3_bucket_terraform_state_id" {}
 variable "tfstate_setup_key" {}
 variable "resource_prefix" {}
 variable "s3_bucket_audit_log_id" {}
-variable "s3_bucket_audit_log_bucket_domain_name" {}
 
 provider "aws" {
   version = ">= 2.24"
@@ -217,6 +216,12 @@ module "iam_role_exec_api" {
 
 ## web
 
+module "s3_bucket_cloudfront_log_web" {
+  source            = "../../../../modules/s3/bucket/cloudfront_log_web"
+  resource_prefix   = "${local.resource_prefix}"
+  logging_bucket_id = "${var.s3_bucket_audit_log_id}"
+}
+
 module "s3_bucket_web" {
   source            = "../../../../modules/s3/bucket/web"
   resource_prefix   = "${local.resource_prefix}"
@@ -224,12 +229,12 @@ module "s3_bucket_web" {
 }
 
 module "cloudfront_web" {
-  source                          = "../../../../modules/cloudfront/web"
-  resource_prefix                 = "${local.resource_prefix}"
-  s3_bucket_audit_log_domain_name = "${var.s3_bucket_audit_log_bucket_domain_name}"
-  s3_bucket_web_id                = "${module.s3_bucket_web.id}"
-  s3_bucket_web_domain_name       = "${module.s3_bucket_web.domain_name}"
-  waf_acl_id                      = "${module.waf_acl_web.id}"
+  source                    = "../../../../modules/cloudfront/web"
+  resource_prefix           = "${local.resource_prefix}"
+  s3_bucket_log_domain_name = "${module.s3_bucket_cloudfront_log_web.bucket_domain_name}"
+  s3_bucket_web_id          = "${module.s3_bucket_web.id}"
+  s3_bucket_web_domain_name = "${module.s3_bucket_web.domain_name}"
+  waf_acl_id                = "${module.waf_acl_web.id}"
 }
 
 ## outputs
@@ -248,10 +253,6 @@ output "cloudformation_api_stack" {
 
 output "s3_bucket_audit_log_id" {
   value = "${var.s3_bucket_audit_log_id}"
-}
-
-output "s3_bucket_audit_log_domain_name" {
-  value = "${var.s3_bucket_audit_log_bucket_domain_name}"
 }
 
 output "cognito_pool_api_id" {
