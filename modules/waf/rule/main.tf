@@ -1,5 +1,4 @@
 variable "resource_prefix" {}
-variable "firehose_arn" {}
 
 ## conditions
 
@@ -140,50 +139,16 @@ resource "aws_waf_rule" "common_size_constraint" {
   }
 }
 
-## acl
-
-resource "aws_waf_web_acl" "common" {
-  name        = "${var.resource_prefix}-CommonAttackProtection"
-  metric_name = "${replace("${var.resource_prefix}", "-", "")}CommonAttackProtection"
-
-  default_action {
-    type = "ALLOW"
-  }
-
-  rules {
-    action {
-      type = "COUNT"
-    }
-
-    priority = 1
-    rule_id  = "${aws_waf_rule.common_size_constraint.id}"
-  }
-
-  rules {
-    action {
-      type = "BLOCK"
-    }
-
-    priority = 2
-    rule_id  = "${aws_waf_rule.common_sql_injection_match.id}"
-  }
-
-  rules {
-    action {
-      type = "BLOCK"
-    }
-
-    priority = 3
-    rule_id  = "${aws_waf_rule.common_xss_match.id}"
-  }
-
-  logging_configuration {
-    log_destination = "${var.firehose_arn}"
-  }
-}
-
 ## outputs
 
-output "id" {
-  value = "${aws_waf_web_acl.common.id}"
+output "rule_size_constraint_id" {
+  value = "${aws_waf_rule.common_size_constraint.id}"
+}
+
+output "rule_sql_injection_match_id" {
+  value = "${aws_waf_rule.common_sql_injection_match.id}"
+}
+
+output "rule_xss_match_id" {
+  value = "${aws_waf_rule.common_xss_match.id}"
 }
