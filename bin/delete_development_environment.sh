@@ -50,9 +50,6 @@ terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" \
 s3_bucket_audit_log_id=$(terraform output s3_bucket_audit_log_id)
 echo "s3_bucket_audit_log_id: ${s3_bucket_audit_log_id}"
 
-s3_bucket_audit_log_bucket_domain_name=$(terraform output s3_bucket_audit_log_bucket_domain_name)
-echo "s3_bucket_audit_log_bucket_domain_name: ${s3_bucket_audit_log_bucket_domain_name}"
-
 cd - || exit 99
 
 ##
@@ -110,11 +107,9 @@ terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" \
 resource_prefix="${service_name:?}-${TF_VAR_stage:?}"
 terraform plan -destroy \
                -var "resource_prefix=${resource_prefix}" \
-               -var "s3_bucket_audit_log_id=${s3_bucket_audit_log_id}" \
-               -var "s3_bucket_audit_log_bucket_domain_name=${s3_bucket_audit_log_bucket_domain_name}"
+               -var "s3_bucket_audit_log_id=${s3_bucket_audit_log_id}"
 terraform destroy -auto-approve \
                   -var "resource_prefix=${resource_prefix}" \
-                  -var "s3_bucket_audit_log_id=${s3_bucket_audit_log_id}" \
-                  -var "s3_bucket_audit_log_bucket_domain_name=${s3_bucket_audit_log_bucket_domain_name}"
+                  -var "s3_bucket_audit_log_id=${s3_bucket_audit_log_id}"
 
 cd - || exit 99

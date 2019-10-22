@@ -1,7 +1,7 @@
 variable "resource_prefix" {}
 variable "stage" {}
 variable "apigw_api_domain_name" {}
-variable "s3_bucket_audit_log_domain_name" {}
+variable "s3_bucket_log_domain_name" {}
 variable "waf_acl_id" {}
 
 resource "aws_cloudfront_distribution" "api" {
@@ -69,8 +69,7 @@ resource "aws_cloudfront_distribution" "api" {
   }
 
   logging_config {
-    bucket = "${var.s3_bucket_audit_log_domain_name}"
-    prefix = "${var.stage}-api"
+    bucket = "${var.s3_bucket_log_domain_name}"
   }
 
   price_class = "PriceClass_200"

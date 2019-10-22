@@ -92,13 +92,19 @@ resource "aws_cloudwatch_log_subscription_filter" "apigw_logfilter" {
   destination_arn = "${aws_kinesis_firehose_delivery_stream.apigw.arn}"
 }
 
+module "s3_bucket_cloudfront_log_api" {
+  source            = "../../../../modules/s3/bucket/cloudfront_log_api"
+  resource_prefix   = "${local.resource_prefix}"
+  logging_bucket_id = "${local.s3_bucket_audit_log_id}"
+}
+
 module "cloudfront_api" {
-  source                           = "../../../../modules/cloudfront/api"
-  resource_prefix                  = "${local.resource_prefix}"
-  stage                            = "${var.stage}"
-  apigw_api_domain_name            = "${var.apigw_api_id}.execute-api.ap-northeast-1.amazonaws.com"
-  s3_bucket_audit_log_domain_name  = "${data.terraform_remote_state.service_base_pre.outputs.s3_bucket_audit_log_domain_name}"
-  waf_acl_id                       = "${data.terraform_remote_state.service_base_pre.outputs.waf_acl_api_id}"
+  source                    = "../../../../modules/cloudfront/api"
+  resource_prefix           = "${local.resource_prefix}"
+  stage                     = "${var.stage}"
+  apigw_api_domain_name     = "${var.apigw_api_id}.execute-api.ap-northeast-1.amazonaws.com"
+  s3_bucket_log_domain_name = "${module.s3_bucket_cloudfront_log_api.bucket_domain_name}"
+  waf_acl_id                = "${data.terraform_remote_state.service_base_pre.outputs.waf_acl_api_id}"
 }
 
 output "api_base_url" {
