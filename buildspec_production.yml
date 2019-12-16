@@ -12,6 +12,7 @@ env:
     TF_VAR_tfstate_service_web_staging_key:    "service.web.stg.terraform.tfstate"
     TF_VAR_tfstate_service_web_production_key: "service.web.prd.terraform.tfstate"
     TF_VAR_tfstate_service_pipeline_key:       "service.pipeline.terraform.tfstate"
+    TF_VAR_tfstate_service_base_post_key:      "service.base.post.prd.terraform.tfstate"
 
 phases:
   install:

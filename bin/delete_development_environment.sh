@@ -53,6 +53,20 @@ echo "s3_bucket_audit_log_id: ${s3_bucket_audit_log_id}"
 cd - || exit 99
 
 ##
+echo "START: base..."
+##
+
+cd environments/service/base/post/ || exit 99
+
+terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" \
+               -backend-config="key=${TF_VAR_tfstate_service_base_post_key:?}"
+terraform validate
+terraform plan
+terraform destroy -auto-approve
+
+cd - || exit 99
+
+##
 echo "START: web..."
 ##
 

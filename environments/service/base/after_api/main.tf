@@ -110,3 +110,7 @@ module "cloudfront_api" {
 output "api_base_url" {
   value = "https://${module.cloudfront_api.domain_name}"
 }
+
+output "s3_bucket_id_cloudfront_api_logs" {
+  value = "${module.s3_bucket_cloudfront_log_api.id}"
+}

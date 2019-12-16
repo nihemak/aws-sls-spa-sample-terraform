@@ -9,6 +9,7 @@ env:
     TF_VAR_tfstate_service_api_key:            "service.api.stg.terraform.tfstate"
     TF_VAR_tfstate_service_base_after_api_key: "service.base.after_api.stg.terraform.tfstate"
     TF_VAR_tfstate_service_web_key:            "service.web.stg.terraform.tfstate"
+    TF_VAR_tfstate_service_base_post_key:      "service.base.post.stg.terraform.tfstate"
 
 phases:
   install:
