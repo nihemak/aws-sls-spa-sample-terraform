@@ -116,3 +116,17 @@ echo "codebuild_name: ${codebuild_name}"
 cd - || exit 99
 
 ./bin/exec_codebuild.sh "${codebuild_name}" "${codecommit_web_branch}"
+
+##
+echo "START: base..."
+##
+
+cd environments/service/base/post/ || exit 99
+
+terraform init -backend-config="bucket=${TF_VAR_s3_bucket_terraform_state_id}" \
+               -backend-config="key=${TF_VAR_tfstate_service_base_post_key:?}"
+terraform validate
+terraform plan
+terraform apply -auto-approve
+
+cd - || exit 99

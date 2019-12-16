@@ -291,6 +291,10 @@ output "s3_bucket_web_arn" {
   value = "${module.s3_bucket_web.arn}"
 }
 
+output "s3_bucket_id_cloudfront_web_logs" {
+  value = "${module.s3_bucket_cloudfront_log_web.id}"
+}
+
 output "cloudfront_web_origin_access_identity" {
   value = "${module.cloudfront_web.origin_access_identity}"
 }

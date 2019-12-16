@@ -13,6 +13,10 @@ resource "aws_s3_bucket" "cloudfront_log_web" {
 
 ## outputs
 
+output "id" {
+  value = "${aws_s3_bucket.cloudfront_log_web.id}"
+}
+
 output "bucket_domain_name" {
   value = "${aws_s3_bucket.cloudfront_log_web.bucket_domain_name}"
 }
